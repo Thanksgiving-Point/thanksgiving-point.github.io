@@ -95,28 +95,29 @@
 <div class="container">
 
   <h2>1. Purpose</h2>
-  <p>This lightweight style guide establishes consistent formatting, naming, and documentation practices across all museum microcontroller firmware projects (Arduino, ESP32, RP2040, Teensy, etc.). It is designed for a small engineering team with a strong emphasis on maintainability.</p>
+  <p>This lightweight style guide establishes consistent formatting, naming, and documentation practices across all museum microcontroller firmware projects (Arduino, ESP32, RP2040, Teensy, etc.). Made with an emphasis on maintainability rather than strict guidelines.</p>
 
   <h2>2. Repository Structure</h2>
   <ul>
-    <li>All firmware lives in a single <code>src/</code> directory.</li>
-    <li>Custom classes use a paired <code>.h</code> and <code>.cpp</code> file in that folder.</li>
-    <li>No per-class subfolders (Arduino IDE compatibility).</li>
+    <li><code>src/</code>: All firmware source files (.cpp, .h)</li>
+    <li><code>hardware</code>: Wiring diagrams, schematics, power notes</li>
+    <li><code>docs/</code>: maintenance notes, troubleshooting guides</li>
+    <li>No per-class subfolders (for Arduino IDE compatibility).</li>
   </ul>
 
   <h2>3. File Header Template</h2>
   <p>Include at the top of every <code>.ino</code>, <code>.h</code>, and <code>.cpp</code> file:</p>
 
 <pre><code>/**
- * @file
- * @brief Short 1–2 sentence summary of the file's purpose.
- *
- * Detailed description if needed. Mention hardware interfaces,
- * expected behavior, and any assumptions.
- *
- * (c) Museum Electronics Team — &lt;year&gt;
+ * File: <filename>
+ * Project: <project title>
+ * Author: <name>
+ * Date: <yyyy-mm-dd>
+ * Description: <short description of this file>
+ * Notes: <dependencies, pin usage, modules, quirks, etc.>
+ * (c) Thanksgiving Point Exhibits Electronics Team — &lt;year&gt;
  */
-</code></pre>
+ </code></pre>
 
   <h2>4. Naming Conventions</h2>
 
@@ -157,12 +158,12 @@ bool isBatteryHealthy(int reading);
   </ul>
 
   <h2>6. Inline Comments</h2>
-  <p>Inline comments are encouraged when clarity is needed. We prefer:</p>
+  <p>Inline comments are encouraged when clarity is needed. Prefered to:</p>
 
   <ul>
     <li>Explain <em>why</em> something is done, not just what it does</li>
     <li>Avoid stating the obvious (“increment i”)</li>
-    <li>Use them to document hardware quirks, timing constraints, electrical behavior, etc.</li>
+    <li>Use them to document hardware/software quirks, timing constraints, electrical behavior, etc.</li>
   </ul>
 
   <p>Inline comment density is not formally required — use judgment and ensure clarity for future maintainers.</p>
@@ -171,7 +172,7 @@ bool isBatteryHealthy(int reading);
   <ul>
     <li>Header files contain declarations + short inline functions</li>
     <li>Source files contain implementations</li>
-    <li>Keep hardware pin definitions and constants in <code>Config.h</code></li>
+    <li>Try to keep hardware pin definitions and constants in <code>Config.h</code></li>
   </ul>
 
   <h2>8. Versioning and Tags</h2>
