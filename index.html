@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Museum Electronics Team – Engineering Docs</title>
+
+  <style>
+    :root {
+      --bg: #f7f7f7;
+      --card-bg: #ffffff;
+      --accent: #0066cc;
+      --text: #222;
+      --text-light: #555;
+      --radius: 14px;
+      --shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    header {
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2.4rem;
+      margin-bottom: 10px;
+    }
+
+    header p {
+      font-size: 1.1rem;
+      color: var(--text-light);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card-bg);
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 30px 40px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    a.main-link {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 12px 20px;
+      border-radius: var(--radius);
+      background: var(--accent);
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+
+    a.main-link:hover {
+      background: #004f99;
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px;
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>Museum Electronics Team</h1>
+    <p>A growing collection of engineering standards, documentation, and tools for building reliable, maintainable interactive exhibits.</p>
+  </header>
+
+  <div class="card">
+    <h2>🚀 Engineering Style Guide</h2>
+    <p>The official C++ / microcontroller style conventions used across our exhibit firmware.  
+    This guide will grow as our systems evolve and our team expands.</p>
+
+    <!-- Update this link if your STYLEGUIDE.md is in a subfolder -->
+    <a class="main-link" href="STYLEGUIDE.md">📄 View the Style Guide</a>
+  </div>
+
+  <footer>
+    © <span id="year"></span> Museum Electronics Team
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
