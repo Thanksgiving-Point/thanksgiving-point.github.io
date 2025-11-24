@@ -1,114 +1,49 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Engineering Style Guide</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Engineering Style Guide</title>
 
-  <style>
-    :root {
-      --bg: #f7f7f7;
-      --card-bg: #ffffff;
-      --accent: #0066cc;
-      --text: #222;
-      --text-light: #555;
-      --radius: 14px;
-      --shadow: 0 4px 16px rgba(0,0,0,0.08);
-      --code-bg: #f0f0f0;
-    }
+    <!-- Shared theme -->
+    <link rel="stylesheet" href="theme.css" />
+  </head>
 
-    body {
-      margin: 0;
-      font-family: system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.7;
-    }
+  <body>
+    <!-- Dark/Light mode toggle -->
+    <button class="theme-toggle" id="themeToggle">Toggle Theme</button>
 
-    header {
-      padding: 40px 20px 20px;
-      text-align: center;
-    }
+    <div class="container">
+      <header>
+        <h1>Engineering Style Guide</h1>
+        <p>
+          Internal coding standards for Thanksgiving Point exhibits firmware.
+          This guide keeps our work readable, maintainable, and consistent as
+          our systems grow.
+        </p>
+      </header>
 
-    header h1 {
-      font-size: 2rem;
-      margin-bottom: 4px;
-    }
+      <h2>1. Purpose</h2>
+      <p>
+        This lightweight style guide establishes consistent formatting, naming,
+        and documentation practices across all firmware projects. Made with an
+        emphasis on maintainability rather than strict guidelines.
+      </p>
 
-    header p {
-      font-size: 1rem;
-      color: var(--text-light);
-      max-width: 700px;
-      margin: 0 auto;
-    }
+      <h2>2. Repository Structure</h2>
+      <ul>
+        <li><code>src/</code>: All firmware source files (.cpp, .h)</li>
+        <li>
+          <code>hardware/</code>: Wiring diagrams, schematics, power notes
+        </li>
+        <li><code>docs/</code>: Maintenance notes, troubleshooting guides</li>
+        <li>No per-class subfolders (for Arduino IDE compatibility).</li>
+      </ul>
 
-    .container {
-      max-width: 800px;
-      margin: 40px auto;
-      padding: 0 20px 60px;
-    }
+      <h2>3. File Header Template</h2>
 
-    h2 {
-      margin-top: 40px;
-      color: var(--accent);
-    }
-
-    h3 {
-      margin-top: 30px;
-    }
-
-    pre {
-      background: var(--code-bg);
-      padding: 12px 16px;
-      border-radius: 8px;
-      overflow-x: auto;
-      font-size: 0.9rem;
-    }
-
-    code {
-      background: var(--code-bg);
-      padding: 2px 4px;
-      border-radius: 4px;
-      font-family: Consolas, monospace;
-    }
-
-    a {
-      color: var(--accent);
-    }
-
-    footer {
-      text-align: center;
-      padding: 40px 20px;
-      font-size: 0.8rem;
-      color: var(--text-light);
-    }
-  </style>
-</head>
-
-<body>
-
-<header>
-  <h1>Engineering Style Guide</h1>
-  <p>Internal coding standards for Thanksgiving Point exhibits firmware. This guide keeps our work readable, maintainable, and consistent as our systems grow.</p>
-</header>
-
-<div class="container">
-
-  <h2>1. Purpose</h2>
-  <p>This lightweight style guide establishes consistent formatting, naming, and documentation practices across all firmware projects. Made with an emphasis on maintainability rather than strict guidelines.</p>
-
-  <h2>2. Repository Structure</h2>
-  <ul>
-    <li><code>src/</code>: All firmware source files (.cpp, .h)</li>
-    <li><code>hardware/</code>: Wiring diagrams, schematics, power notes</li>
-    <li><code>docs/</code>: maintenance notes, troubleshooting guides</li>
-    <li>No per-class subfolders (for Arduino IDE compatibility).</li>
-  </ul>
-
-  <h2>3. File Header Template</h2>
-  <h3>3.1 Include at the top of every main <code>.ino</code> file:</h3>
-
-<pre><code>/**
+      <h3>3.1 Main <code>.ino</code> file:</h3>
+      <pre><code>/**
  * File: &lt;filename&gt;
  * Project: &lt;project title&gt;
  * Author: &lt;name&gt;
@@ -117,46 +52,47 @@
  * Notes: &lt;dependencies, pin usage, modules, quirks, etc.&gt;
  * (c) Thanksgiving Point Exhibits Electronics Team — &lt;year&gt;
  */
- </code></pre>
+</code></pre>
 
-  <h3>3.2 Include at the top of every .h file: </h3>
-  <pre><code>/**
+      <h3>3.2 Header <code>.h</code> files:</h3>
+      <pre><code>/**
  * &lt;class_name&gt;
- * 
- * &lt;descriptive one liner and list if necessary&gt;
+ *
+ * &lt;descriptive one-liner and list if necessary&gt;
  * Trigger-based audio playback for MKR Zero.
  * - Exposes play()
  * - Manages busy state and pulse timing
  * - Non-blocking update() method
  */
- </code></pre>
+</code></pre>
 
+      <h2>4. Naming Conventions</h2>
 
-  <h2>4. Naming Conventions</h2>
+      <h3>4.1 Variables</h3>
+      <ul>
+        <li>Local variables: <code>camelCase</code></li>
+        <li>Member variables: <code>camelCase_</code> (trailing underscore)</li>
+        <li>Global constants: <code>SCREAMING_SNAKE_CASE</code></li>
+      </ul>
 
-  <h3>4.1 Variables</h3>
-  <ul>
-    <li>Local variables: <code>camelCase</code></li>
-    <li>Member variables: <code>camelCase_</code> (trailing underscore)</li>
-    <li>Global constants: <code>SCREAMING_SNAKE_CASE</code></li>
-  </ul>
+      <h3>4.2 Types</h3>
+      <ul>
+        <li>Classes: <code>PascalCase</code></li>
+        <li>Structs: <code>PascalCase</code></li>
+        <li>Enum types: <code>PascalCase</code></li>
+        <li>Enum values: <code>kEnumName</code></li>
+      </ul>
 
-  <h3>4.2 Types</h3>
-  <ul>
-    <li>Classes: <code>PascalCase</code></li>
-    <li>Structs: also <code>PascalCase</code></li>
-    <li>Enums Type Name: <code>PascalCase</code></li>
-    <li>Enums Member Name: <code>SCREAMING_SNAKE_CASE</code></li>
-  </ul>
+      <h2>5. Functions and Methods</h2>
 
-  <h2>5. Functions and Methods</h2>
+      <h3>5.1 Documentation</h3>
+      <p>
+        Each function includes a one-line summary + parameters + return value.
+      </p>
 
-  <h3>5.1 Documentation</h3>
-  <p>Each function includes a one-line summary + parameters + return value.</p>
-
-<pre><code>/**
+      <pre><code>/**
  * @brief description of what the function does.
- * more detailed explanation if needed
+ * more detailed explanation if needed.
  *
  * @param &lt;value&gt; description of parameter
  * @return &lt;value&gt; description of return value
@@ -164,65 +100,89 @@
 bool camelCase(int param);
 </code></pre>
 
-  <h3>5.2 Formatting</h3>
-  <ul>
-    <li>2-space indentation (clang-format)</li>
-    <li>Automatic formatting enforced before commits</li>
-    <li>Line length: determined by clang-format (usually 100–120 chars)</li>
-  </ul>
+      <h3>5.2 Formatting</h3>
+      <ul>
+        <li>2-space indentation (clang-format)</li>
+        <li>Automatic formatting required before commits</li>
+        <li>
+          Line length: determined by clang-format (typically 100–120 chars)
+        </li>
+      </ul>
 
-  <h2>6. Inline Comments</h2>
-  <p>Inline comments are encouraged when clarity is needed. Prefered to:</p>
+      <h2>6. Inline Comments</h2>
+      <p>
+        Inline comments are encouraged when clarity is needed. Best used to:
+      </p>
 
-  <ul>
-    <li>Explain <em>why</em> something is done, not just what it does</li>
-    <li>Avoid stating the obvious (“increment i”)</li>
-    <li>Use them to document hardware/software quirks, timing constraints, electrical behavior, etc.</li>
-  </ul>
+      <ul>
+        <li>Explain <em>why</em> something is done, not just what it does</li>
+        <li>Avoid restating obvious behavior</li>
+        <li>
+          Capture hardware/software quirks, timing constraints, or electrical
+          considerations
+        </li>
+      </ul>
 
-  <p>Inline comment density is not formally required — use judgment and ensure clarity for future maintainers.</p>
+      <p>
+        Comment density is not strictly defined — use good judgment and err on
+        the side of clarity.
+      </p>
 
-  <h2>7. File Organization</h2>
-  <ul>
-    <li>Header files contain declarations + short inline functions</li>
-    <li>Source files contain implementations/definitions</li>
-    <li>Try to keep hardware pin definitions and constants in <code>Config.h</code></li>
-  </ul>
+      <h2>7. File Organization</h2>
+      <ul>
+        <li>Headers: declarations + short inline methods</li>
+        <li>Sources: implementations</li>
+        <li>Pin maps and constants go in <code>Config.h</code></li>
+      </ul>
 
-  <h2>8. Versioning and Tags</h2>
-  <p>Use descriptive tags for important project milestones, e.g.:</p>
+      <h2>8. Versioning and Tags</h2>
+      <p>Use descriptive tags for major milestones:</p>
 
-<pre><code>v0.9-mkrzero-i2s-final
+      <pre><code>v0.9-mkrzero-i2s-final
 v1.0-sound-module-refactor
 </code></pre>
 
-  <h2>9. Hardware Documentation</h2>
-  <p>For <code>hardware/</code> folder</p>
-  
-  <ul>
-    <li>Document wiring, connector types, calculated power requirements/ratings of components</li>
-    <li>Define startup quirks or power/reset procedures</li>
-    <li>Calibration steps</li>
-    <li>Include schematics pdf if possible</li>
-  </ul>
+      <h2>9. Hardware Documentation</h2>
+      <ul>
+        <li>Wiring diagrams and connector references</li>
+        <li>Power calculations and component ratings</li>
+        <li>Startup/reset quirks</li>
+        <li>Calibration instructions</li>
+        <li>PDF schematics (if available)</li>
+      </ul>
 
-  <h2>10. README.md Template</h2>
-  <ul>
-    <li>Overview: 5-10 sentence summary</li>
-    <li>Hardware List: microcontrollers, sensors, power supplies, etc.</li>
-    <li>Wiring Diagram</li>
-    <li>Software Architecture: key classes only and data flow description if too complex</li>
-    <li>Troubleshooting & known issues and warnings</li>
-  </ul>
-</div>
+      <h2>10. README.md Template</h2>
+      <ul>
+        <li>Overview (5–10 sentences)</li>
+        <li>Hardware list</li>
+        <li>Wiring diagram</li>
+        <li>Software architecture summary</li>
+        <li>Troubleshooting, warnings, known issues</li>
+      </ul>
+    </div>
+    <!-- end container -->
 
-<footer>
-  © <span id="year"></span> Thanksgiving Point Exhibits Electronics Team
-</footer>
+    <footer>
+      © <span id="year"></span> Thanksgiving Point Exhibits Electronics Team
+    </footer>
 
-<script>
-  document.getElementById('year').textContent = new Date().getFullYear();
-</script>
+    <script>
+      // Theme loader
+      const root = document.documentElement;
+      const btn = document.getElementById("themeToggle");
 
-</body>
+      if (localStorage.getItem("theme") === "dark") {
+        root.classList.add("dark");
+      }
+
+      btn.addEventListener("click", () => {
+        root.classList.toggle("dark");
+        const mode = root.classList.contains("dark") ? "dark" : "light";
+        localStorage.setItem("theme", mode);
+      });
+
+      // Footer year
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+  </body>
 </html>

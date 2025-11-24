@@ -1,101 +1,61 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Thanksgiving Point Exhibits Electronics Team – Engineering Docs</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Thanksgiving Point Exhibits Electronics Team – Engineering Docs
+    </title>
 
-  <style>
-    :root {
-      --bg: #f7f7f7;
-      --card-bg: #ffffff;
-      --accent: #0066cc;
-      --text: #222;
-      --text-light: #555;
-      --radius: 14px;
-      --shadow: 0 4px 16px rgba(0,0,0,0.08);
-    }
+    <!-- Apply theme -->
+    <link rel="stylesheet" href="theme.css" />
+  </head>
 
-    body {
-      margin: 0;
-      font-family: system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-    }
+  <body>
+    <button class="theme-toggle" id="themeToggle">Toggle Theme</button>
 
-    header {
-      padding: 60px 20px;
-      text-align: center;
-    }
+    <div class="container">
+      <header>
+        <h1>Thanksgiving Point Exhibits Electronics Team</h1>
+        <p>
+          A growing collection of documentation, engineering standards, and
+          tools for building reliable, maintainable interactive exhibits.
+        </p>
+      </header>
 
-    header h1 {
-      font-size: 2.4rem;
-      margin-bottom: 10px;
-    }
+      <div class="card">
+        <h2 class="card-title">🚀 Engineering Style Guide</h2>
+        <p>
+          The official C++ / microcontroller style conventions used across our
+          exhibit firmware. This guide will grow as our systems evolve and our
+          team expands.
+        </p>
 
-    header p {
-      font-size: 1.1rem;
-      color: var(--text-light);
-      max-width: 600px;
-      margin: 0 auto;
-    }
+        <a class="main-link" href="styleguide.html">📄 View the Style Guide</a>
+      </div>
 
-    .card {
-      background: var(--card-bg);
-      max-width: 600px;
-      margin: 40px auto;
-      padding: 30px 40px;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
+      <footer>
+        © <span id="year"></span> Thanksgiving Point Exhibits Electronics Team
+      </footer>
+    </div>
 
-    a.main-link {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 12px 20px;
-      border-radius: var(--radius);
-      background: var(--accent);
-      color: white;
-      text-decoration: none;
-      font-weight: 600;
-      transition: background 0.2s;
-    }
+    <script>
+      const root = document.documentElement;
+      const btn = document.getElementById("themeToggle");
 
-    a.main-link:hover {
-      background: #004f99;
-    }
+      // Load saved theme
+      if (localStorage.getItem("theme") === "dark") {
+        root.classList.add("dark");
+      }
 
-    footer {
-      text-align: center;
-      padding: 30px;
-      color: var(--text-light);
-      font-size: 0.9rem;
-    }
-  </style>
-</head>
+      btn.addEventListener("click", () => {
+        root.classList.toggle("dark");
+        const mode = root.classList.contains("dark") ? "dark" : "light";
+        localStorage.setItem("theme", mode);
+      });
 
-<body>
-
-  <header>
-    <h1>Thanksgiving Point Exhibits Electronics Team</h1>
-    <p>A growing collection of documentation, engineering standards, and tools for building reliable, maintainable interactive exhibits.</p>
-  </header>
-
-  <div class="card">
-    <h2>🚀 Engineering Style Guide</h2>
-    <p>The official C++ / microcontroller style conventions used across our exhibit firmware.  
-    This guide will grow as our systems evolve and our team expands.</p>
-
-    <a class="main-link" href="styleguide.html">📄 View the Style Guide</a>
-  </div>
-
-  <footer>
-    © <span id="year"></span> Thanksgiving Point Exhibits Electronics Team
-  </footer>
-
-  <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
-</body>
+      // Footer year updater
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+  </body>
 </html>

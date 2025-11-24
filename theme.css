@@ -1,0 +1,188 @@
+/* 
+   LIGHT MODE (default)
+*/
+:root {
+  /* neutral surfaces */
+  --bg: #fafafa;
+  --bg-alt: #ffffff;
+  --fg: #1a1a1a;
+
+  /* highlight colors */
+  --accent: #2b8df1; /* sky blue */
+  --accent-soft: #bee3ff; /* soft sky */
+  --highlight: #ffd760; /* warm yellow */
+
+  /* borders */
+  --border: #dcdcdc;
+
+  /* typography */
+  --font-body:
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+}
+
+/* 
+   DARK MODE (default)
+*/
+:root.dark {
+  --bg: #121212;
+  --bg-alt: #1e1e1e;
+  --fg: #eeeeee;
+
+  --accent: #71b9ff; /* lighter sky blue */
+  --accent-soft: #2a4766;
+  --highlight: #ffdd6d;
+
+  --border: #333333;
+}
+
+/*
+   GLOBAL ELEMENTS
+*/
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  margin: 0;
+  padding: 0;
+  line-height: 1.6;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+/* 
+   PAGE WRAPPER
+*/
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.2rem;
+}
+
+/*
+   TYPOGRAPHY
+*/
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 600;
+  line-height: 1.2;
+  margin-top: 2.2rem;
+  margin-bottom: 0.8rem;
+}
+
+h1 {
+  font-size: 2rem;
+  color: var(--accent);
+}
+
+h2 {
+  font-size: 1.6rem;
+  color: var(--highlight);
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/*
+   CARD / SECTION STYLING
+*/
+.card {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  padding: 1.2rem 1.4rem;
+  margin: 1.4rem 0;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.card:hover {
+  border-color: var(--accent);
+}
+
+/* 
+  CARD TITLE
+*/
+.card-title {
+}
+
+/*
+   BUTTONS — including the theme toggle
+*/
+button,
+.theme-toggle {
+  display: inline-block;
+  background: var(--accent);
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease;
+}
+
+button:hover,
+.theme-toggle:hover {
+  background: var(--highlight);
+  color: #1a1a1a;
+}
+
+button:active,
+.theme-toggle:active {
+  transform: scale(0.96);
+}
+
+/* fixed toggle button placement */
+.theme-toggle {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 999;
+}
+
+/* 
+   CODE BLOCK STYLING
+*/
+code {
+  padding: 0.2rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+pre {
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+}
+
+/*
+   FOOTER
+*/
+footer {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.85rem;
+  color: var(--fg);
+  opacity: 0.7;
+  text-align: center;
+}
