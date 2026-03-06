@@ -7,31 +7,36 @@
       Thanksgiving Point Exhibits Electronics Team – Engineering Docs
     </title>
 
-    <!-- Apply theme -->
     <link rel="stylesheet" href="theme.css" />
   </head>
 
   <body>
-    <button class="theme-toggle" id="themeToggle">Toggle Theme</button>
+    <nav class="top-bar">
+      <a class="site-name" href="index.html">TP Electronics</a>
+      <button class="theme-toggle" id="themeToggle">
+        <span id="themeIcon">☀️</span> Theme
+      </button>
+    </nav>
 
     <div class="container">
-      <header>
-        <h1>Thanksgiving Point Exhibits Electronics Team</h1>
+      <div class="hero">
+        <span class="leaf-accent"></span>
+        <h1>Exhibits Electronics Team</h1>
         <p>
           A growing collection of documentation, engineering standards, and
           tools for building reliable, maintainable interactive exhibits.
         </p>
-      </header>
+      </div>
+
+      <hr class="section-divider" />
 
       <div class="card">
-        <h2 class="card-title">🚀 Engineering Style Guide</h2>
+        <h2 class="card-title">Software Style Guide</h2>
         <p>
-          The official C++ / microcontroller style conventions used across our
-          exhibit firmware. This guide will grow as our systems evolve and our
-          team expands.
+          The lightweight C/C++ style conventions used across our exhibit
+          firmware. Meant for consistency and readability.
         </p>
-
-        <a class="main-link" href="styleguide.html">📄 View the Style Guide</a>
+        <a class="main-link" href="styleguide.html"> View the Style Guide →</a>
       </div>
 
       <footer>
@@ -42,19 +47,24 @@
     <script>
       const root = document.documentElement;
       const btn = document.getElementById("themeToggle");
+      const icon = document.getElementById("themeIcon");
 
-      // Load saved theme
+      function updateIcon() {
+        icon.textContent = root.classList.contains("dark") ? "🌙" : "☀️";
+      }
+
       if (localStorage.getItem("theme") === "dark") {
         root.classList.add("dark");
       }
+      updateIcon();
 
       btn.addEventListener("click", () => {
         root.classList.toggle("dark");
         const mode = root.classList.contains("dark") ? "dark" : "light";
         localStorage.setItem("theme", mode);
+        updateIcon();
       });
 
-      // Footer year updater
       document.getElementById("year").textContent = new Date().getFullYear();
     </script>
   </body>
