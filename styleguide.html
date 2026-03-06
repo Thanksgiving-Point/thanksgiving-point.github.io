@@ -5,56 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Engineering Style Guide</title>
 
-    <!-- Shared theme -->
     <link rel="stylesheet" href="theme.css" />
   </head>
 
   <body>
-    <!-- Dark/Light mode toggle -->
-    <button class="theme-toggle" id="themeToggle">Toggle Theme</button>
+    <nav class="top-bar">
+      <a class="site-name" href="index.html">TP Electronics</a>
+      <button class="theme-toggle" id="themeToggle">
+        <span id="themeIcon">☀️</span> Theme
+      </button>
+    </nav>
 
     <div class="container">
-      <header>
-        <h1>Engineering Style Guide</h1>
+      <a class="back-link" href="index.html">← Back to Home</a>
+
+      <div class="hero">
+        <span class="leaf-accent"></span>
+        <h1>Style Guide</h1>
         <p>
-          Internal coding standards for Thanksgiving Point exhibits firmware.
-          This guide keeps our work readable, maintainable, and consistent as
-          our systems grow.
+          Internal coding standards for Thanksgiving Point's exhibits firmware.
+          Aiming to keep our work readable, maintainable, and consistent as our
+          systems grow. Made with an emphasis on maintainability rather than
+          strict guidelines.
         </p>
-      </header>
+      </div>
 
-      <h2>1. Purpose</h2>
-      <p>
-        This lightweight style guide establishes consistent formatting, naming,
-        and documentation practices across all firmware projects. Made with an
-        emphasis on maintainability rather than strict guidelines.
-      </p>
-
-      <h2>2. Repository Structure</h2>
+      <h2>1. Repository Structure</h2>
       <ul>
-        <li><code>src/</code>: All firmware source files (.cpp, .h)</li>
         <li>
-          <code>hardware/</code>: Wiring diagrams, schematics, power notes
+          <code>./</code> - Main .ino sketch, README.md, (optional sketch.yaml
+          and .clangd)
         </li>
-        <li><code>docs/</code>: Maintenance notes, troubleshooting guides</li>
-        <li>No per-class subfolders (for Arduino IDE compatibility).</li>
+        <li><code>src/</code> — All firmware source files (.cpp, .h)</li>
+        <li>
+          <code>docs/</code> — Schematics, power notes, maintenance notes,
+          troubleshooting guides
+        </li>
+        <li>No per-class subfolders (for Arduino IDE compatibility)</li>
       </ul>
 
-      <h2>3. File Header Template</h2>
+      <h2>2. File Header Template</h2>
 
-      <h3>3.1 Main <code>.ino</code> file:</h3>
+      <h3>2.1 Main <code>.ino</code> file</h3>
       <pre><code>/**
- * File: &lt;filename&gt;
- * Project: &lt;project title&gt;
- * Author: &lt;name&gt;
- * Date: &lt;mm-dd-yy&gt;
- * Description: &lt;short description of this file&gt;
- * Notes: &lt;dependencies, pin usage, modules, quirks, etc.&gt;
- * (c) Thanksgiving Point Exhibits Electronics Team — &lt;year&gt;
- */
-</code></pre>
+* Project: &lt;project/interactive title&gt;
+* File: &lt;filename&gt;
+* Description: &lt;short description of this file&gt;
+*
+* Author: &lt;name&gt;
+* Date: &lt;mm-dd-yy&gt;
+* Hardware: &lt;board and hardware used&gt;
+* Notes: &lt;dependencies, pin usage, modules, quirks, etc.&gt;
+*
+* (c) Thanksgiving Point Exhibits Electronics Team — &lt;year&gt;
+*/</code></pre>
 
-      <h3>3.2 Header <code>.h</code> files:</h3>
+      <h3>2.2 Header <code>.h</code> files</h3>
       <pre><code>/**
  * &lt;class_name&gt;
  *
@@ -63,19 +69,20 @@
  * - Exposes play()
  * - Manages busy state and pulse timing
  * - Non-blocking update() method
- */
-</code></pre>
+ */</code></pre>
 
-      <h2>4. Naming Conventions</h2>
+      <h2>3. Naming Conventions</h2>
 
-      <h3>4.1 Variables</h3>
+      <h3>3.1 Variables</h3>
       <ul>
-        <li>Local variables: <code>camelCase</code></li>
-        <li>Member variables: <code>camelCase_</code> (trailing underscore)</li>
+        <li>Local variables: <code>snake_case</code></li>
+        <li>
+          Member variables: <code>snake_case_</code> (trailing underscore)
+        </li>
         <li>Global constants: <code>SCREAMING_SNAKE_CASE</code></li>
       </ul>
 
-      <h3>4.2 Types</h3>
+      <h3>3.2 Types</h3>
       <ul>
         <li>Classes: <code>PascalCase</code></li>
         <li>Structs: <code>PascalCase</code></li>
@@ -83,9 +90,9 @@
         <li>Enum values: <code>kEnumName</code></li>
       </ul>
 
-      <h2>5. Functions and Methods</h2>
+      <h2>4. Functions and Methods</h2>
 
-      <h3>5.1 Documentation</h3>
+      <h3>4.1 Documentation</h3>
       <p>
         Each function includes a one-line summary + parameters + return value.
       </p>
@@ -97,10 +104,9 @@
  * @param &lt;value&gt; description of parameter
  * @return &lt;value&gt; description of return value
  */
-bool camelCase(int param);
-</code></pre>
+bool camelCase(int param);</code></pre>
 
-      <h3>5.2 Formatting</h3>
+      <h3>4.2 Formatting</h3>
       <ul>
         <li>2-space indentation (clang-format)</li>
         <li>Automatic formatting required before commits</li>
@@ -109,14 +115,14 @@ bool camelCase(int param);
         </li>
       </ul>
 
-      <h2>6. Inline Comments</h2>
+      <h2>5. Inline Comments</h2>
       <p>
-        Inline comments are encouraged when clarity is needed. Best used to:
+        Inline comments are encouraged when clarity is needed. But avoid stating
+        obvious behavior. Best used to:
       </p>
 
       <ul>
         <li>Explain <em>why</em> something is done, not just what it does</li>
-        <li>Avoid restating obvious behavior</li>
         <li>
           Capture hardware/software quirks, timing constraints, or electrical
           considerations
@@ -128,21 +134,20 @@ bool camelCase(int param);
         the side of clarity.
       </p>
 
-      <h2>7. File Organization</h2>
+      <h2>6. File Organization</h2>
       <ul>
-        <li>Headers: declarations + short inline methods</li>
-        <li>Sources: implementations</li>
+        <li>Headers (<code>.h</code>): declarations + short inline methods</li>
+        <li>Sources (<code>.cpp</code>): implementations</li>
         <li>Pin maps and constants go in <code>Config.h</code></li>
       </ul>
 
-      <h2>8. Versioning and Tags</h2>
+      <h2>7. Versioning and Tags</h2>
       <p>Use descriptive tags for major milestones:</p>
 
       <pre><code>v0.9-mkrzero-i2s-final
-v1.0-sound-module-refactor
-</code></pre>
+v1.0-sound-module-refactor</code></pre>
 
-      <h2>9. Hardware Documentation</h2>
+      <h2>8. Hardware Documentation</h2>
       <ul>
         <li>Wiring diagrams and connector references</li>
         <li>Power calculations and component ratings</li>
@@ -151,37 +156,44 @@ v1.0-sound-module-refactor
         <li>PDF schematics (if available)</li>
       </ul>
 
-      <h2>10. README.md Template</h2>
+      <h2>9. README.md Template</h2>
       <ul>
         <li>Overview (5–10 sentences)</li>
         <li>Hardware list</li>
         <li>Wiring diagram</li>
         <li>Software architecture summary</li>
-        <li>Troubleshooting, warnings, known issues</li>
+        <li>
+          Important troubleshooting, warnings, known issues, future
+          improvements, any important context for anyone reading the project
+        </li>
       </ul>
-    </div>
-    <!-- end container -->
 
-    <footer>
-      © <span id="year"></span> Thanksgiving Point Exhibits Electronics Team
-    </footer>
+      <footer>
+        © <span id="year"></span> Thanksgiving Point Exhibits Electronics Team
+      </footer>
+    </div>
 
     <script>
-      // Theme loader
       const root = document.documentElement;
       const btn = document.getElementById("themeToggle");
+      const icon = document.getElementById("themeIcon");
+
+      function updateIcon() {
+        icon.textContent = root.classList.contains("dark") ? "🌙" : "☀️";
+      }
 
       if (localStorage.getItem("theme") === "dark") {
         root.classList.add("dark");
       }
+      updateIcon();
 
       btn.addEventListener("click", () => {
         root.classList.toggle("dark");
         const mode = root.classList.contains("dark") ? "dark" : "light";
         localStorage.setItem("theme", mode);
+        updateIcon();
       });
 
-      // Footer year
       document.getElementById("year").textContent = new Date().getFullYear();
     </script>
   </body>
