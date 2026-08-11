@@ -1,60 +1,64 @@
 /*
-   LIGHT MODE (default) — green earth tones
+   LIGHT MODE (default) — forest greens on a near-neutral ground
 */
 :root {
-  /* surfaces */
-  --bg: #f5f2ec;
-  --bg-alt: #ffffff;
-  --bg-subtle: #ebe7df;
-  --fg: #2c2a25;
-  --fg-muted: #6b6560;
+  /* Surfaces. One neutral ramp, tinted very slightly toward the accent hue so
+     the greys never fight the green. "muted" steps away from the page — darker
+     here, lighter in dark mode — and "raised" always steps toward the light. */
+  --surface: #f7f8f5;
+  --surface-raised: #ffffff;
+  --surface-muted: #e8ebe3;
 
-  /* earth greens */
-  --accent: #3d7c47;
-  --accent-hover: #326a3b;
-  --accent-soft: #d4e8d0;
+  /* Text. Both pass WCAG AA on every surface above. */
+  --text: #1b1f1b;
+  --text-muted: #59605a;
 
-  /* warm earth highlights */
-  --highlight: #a0703c;
-  --highlight-soft: #f0dcc3;
+  /* Forest green, reserved for things you can interact with. */
+  --accent: #2f6b3d;
+  --accent-hover: #23522e;
 
-  /* borders & shadows */
-  --border: #d5cfc5;
-  --shadow: rgba(44, 42, 37, 0.06);
+  --border: #d4d9d0;
+  --shadow: rgba(27, 31, 27, 0.06);
 
-  /* code */
-  --code-bg: #eae6de;
-
-  /* typography */
+  /* typography
+     One family throughout: IBM Plex Sans for text, IBM Plex Mono for code. An
+     engineering family for an engineering team. Both fall back to system faces. */
   --font-body:
-    "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica,
-    Arial, sans-serif;
-  --font-heading:
-    "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, Roboto, Helvetica,
-    Arial, sans-serif;
+    "IBM Plex Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  --font-mono:
+    "IBM Plex Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    monospace;
+
+  /* type scale — 17px base on a 1.25 ratio, hero fluid to the viewport.
+     The ratio is what separates one heading level from the next; below about
+     1.2 the levels blur together and the page reads as flat. */
+  --text-xs: 0.78rem;
+  --text-sm: 0.9rem;
+  --text-base: 1.0625rem;
+  --text-md: 1.3125rem;
+  --text-lg: 1.625rem;
+  --text-xl: 2.0625rem;
+  --text-hero: clamp(2.15rem, 1.5rem + 2.6vw, 3rem);
 }
 
 /*
    DARK MODE — forest at dusk
 */
 :root.dark {
-  --bg: #1a1e1a;
-  --bg-alt: #242924;
-  --bg-subtle: #2a302a;
-  --fg: #e0ddd6;
-  --fg-muted: #9a9690;
+  --surface: #131711;
+  --surface-raised: #191e18;
+  --surface-muted: #1f241e;
 
-  --accent: #6db87a;
-  --accent-hover: #85cea2;
-  --accent-soft: #2e4533;
+  --text: #e4e7e0;
+  --text-muted: #a2a89f;
 
-  --highlight: #c9944e;
-  --highlight-soft: #3d3024;
+  --accent: #7ec98d;
+  --accent-hover: #9bd9a7;
 
-  --border: #3a3f3a;
-  --shadow: rgba(0, 0, 0, 0.2);
-
-  --code-bg: #2a302a;
+  --border: #2e352d;
+  /* Deeper than the light theme's — a 6% shadow is invisible on near-black. */
+  --shadow: rgba(0, 0, 0, 0.4);
 }
 
 /*
@@ -67,14 +71,20 @@
 }
 
 body {
-  background: var(--bg);
-  color: var(--fg);
+  /* Grain sits on top of the surface colour, so it reads in both themes. The
+     texture is uniform noise — it tiles without a visible seam — and stays
+     fixed to the viewport so it doesn't crawl as the page scrolls. */
+  background-color: var(--surface);
+  background-image: url("assets/grainy-texture.png");
+  background-attachment: fixed;
+  color: var(--text);
   font-family: var(--font-body);
+  font-size: var(--text-base);
   margin: 0;
   padding: 0;
-  line-height: 1.7;
+  line-height: 1.65;
   transition:
-    background 0.3s ease,
+    background-color 0.3s ease,
     color 0.3s ease;
   -webkit-font-smoothing: antialiased;
 }
@@ -89,67 +99,41 @@ body {
 }
 
 /*
-   TOP BAR
-*/
-.top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem 1.5rem;
-  background: var(--bg-alt);
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  backdrop-filter: blur(8px);
-}
-
-.top-bar .site-name {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--accent);
-  text-decoration: none;
-  letter-spacing: 0.02em;
-}
-
-.top-bar .site-name:hover {
-  color: var(--accent-hover);
-}
-
-/*
    TYPOGRAPHY
 */
 h1,
 h2,
 h3,
 h4 {
-  font-family: var(--font-heading);
-  font-weight: 700;
+  font-family: var(--font-body);
+  font-weight: 600;
   line-height: 1.25;
   margin-top: 2.4rem;
   margin-bottom: 0.6rem;
 }
 
+/* Headings carry hierarchy through size, weight, and rules — not colour. The
+   green is spent on links and controls, so it always means "you can act here". */
 h1 {
-  font-size: 2rem;
-  color: var(--accent);
-  letter-spacing: -0.01em;
+  font-size: var(--text-xl);
+  color: var(--text);
+  letter-spacing: -0.015em;
 }
 
 h2 {
-  font-size: 1.4rem;
-  color: var(--highlight);
+  font-size: var(--text-lg);
+  color: var(--text);
   padding-bottom: 0.4rem;
-  border-bottom: 2px solid var(--border);
+  border-bottom: 1px solid var(--border);
 }
 
 h3 {
-  font-size: 1.15rem;
-  color: var(--fg);
+  font-size: var(--text-md);
+  color: var(--text);
 }
 
 p {
-  color: var(--fg);
+  color: var(--text);
   margin: 0.6rem 0 1rem;
 }
 
@@ -169,117 +153,219 @@ a:hover {
 */
 .hero {
   text-align: center;
-  padding: 2rem 0 1.5rem;
+  padding: 2.5rem 0 2rem;
 }
 
 .hero h1 {
-  margin-top: 0.5rem;
+  margin: 0.35rem 0 0;
+  font-size: var(--text-hero);
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: var(--text);
 }
 
-.hero p {
-  color: var(--fg-muted);
-  font-size: 1.05rem;
-  max-width: 600px;
-  margin: 0.5rem auto 0;
-}
-
-.hero .leaf-accent {
-  font-size: 2.2rem;
-  display: block;
-  margin-bottom: 0.25rem;
-}
-
-/*
-   CARD / SECTION STYLING
-*/
-.card {
-  background: var(--bg-alt);
-  border: 1px solid var(--border);
-  padding: 1.5rem 1.6rem;
-  margin: 1.6rem 0;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px var(--shadow);
-  transition:
-    background 0.3s ease,
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.card:hover {
-  border-color: var(--accent);
-  box-shadow: 0 4px 16px var(--shadow);
-}
-
-.card-title {
-  margin-top: 0;
-  font-size: 1.25rem;
-}
-
-.card-icon {
-  font-size: 1.8rem;
-  margin-bottom: 0.5rem;
-  display: block;
-}
-
-/*
-   MAIN LINK (call-to-action inside cards)
-*/
-.main-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.8rem;
-  padding: 0.55rem 1.1rem;
-  background: var(--accent);
-  color: #fff;
-  border-radius: 8px;
+.eyebrow {
+  margin: 0;
+  font-size: var(--text-xs);
   font-weight: 600;
-  font-size: 0.9rem;
-  transition:
-    background 0.15s ease,
-    transform 0.1s ease;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
 }
 
-.main-link:hover {
-  background: var(--accent-hover);
-  text-decoration: none;
-  transform: translateY(-1px);
-}
-
-.main-link:active {
-  transform: translateY(0);
+.lede {
+  max-width: 46ch;
+  margin: 1rem auto 0;
+  font-size: var(--text-md);
+  color: var(--text-muted);
+  text-wrap: pretty;
 }
 
 /*
-   BUTTONS — theme toggle
+   LOGO FRAME
+   Circular container for the museum mark — the image lives in assets/.
 */
-button,
-.theme-toggle {
+.site-logo {
+  width: 5.5rem;
+  height: 5.5rem;
+  margin: 0 auto 1.5rem;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  box-shadow: 0 2px 10px var(--shadow);
+}
+
+/* contain + padding suits a logo mark; switch to cover for a photo. */
+.site-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/*
+   DOC INDEX
+   Hairline-separated rows. The whole row is the link, so there is no button —
+   the title, the summary, and the meta are all one target.
+*/
+.section-label {
+  margin: 0;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.doc-index {
+  margin-top: 0.9rem;
+  border-top: 1px solid var(--border);
+}
+
+.doc-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.4rem 1.5rem;
+  align-items: baseline;
+  padding: 1.25rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  color: inherit;
+  transition: background 0.15s ease;
+}
+
+.doc-row:hover {
+  background: var(--surface-muted);
+  text-decoration: none;
+}
+
+.doc-row:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.doc-row-title {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--text);
+  transition: color 0.15s ease;
+}
+
+.doc-row:hover .doc-row-title {
+  color: var(--accent);
+}
+
+.doc-row-summary {
+  margin: 0.2rem 0 0;
+  max-width: 52ch;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  text-wrap: pretty;
+}
+
+.doc-row-meta {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  background: var(--bg-subtle);
-  color: var(--fg);
+  gap: 0.6rem;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.doc-row-arrow {
+  width: 1rem;
+  height: 1rem;
+  transition: transform 0.15s ease;
+}
+
+.doc-row:hover .doc-row-arrow {
+  transform: translateX(3px);
+  color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .doc-row,
+  .doc-row-arrow,
+  .doc-row-title {
+    transition: none;
+  }
+}
+
+/* Below the fold of a phone, the meta drops under the summary. */
+@media (max-width: 30rem) {
+  .doc-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/*
+   THEME TOGGLE
+   A single floating control in the lower-left gutter. Icon only: it shows the
+   theme you would get by pressing it, not the one you are already in.
+*/
+.theme-toggle {
+  position: fixed;
+  left: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  background: var(--surface-raised);
+  color: var(--text-muted);
   border: 1px solid var(--border);
-  padding: 0.45rem 0.85rem;
-  border-radius: 8px;
-  font-size: 0.85rem;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px var(--shadow);
   cursor: pointer;
   transition:
-    background 0.15s ease,
+    color 0.15s ease,
     border-color 0.15s ease,
     transform 0.1s ease;
 }
 
-button:hover,
 .theme-toggle:hover {
-  background: var(--accent-soft);
+  color: var(--accent);
   border-color: var(--accent);
 }
 
-button:active,
 .theme-toggle:active {
-  transform: scale(0.97);
+  transform: scale(0.94);
+}
+
+.theme-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.theme-toggle .icon {
+  display: block;
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+/* Light theme offers the moon; dark theme offers the sun. */
+.theme-toggle .icon-sun {
+  display: none;
+}
+
+:root.dark .theme-toggle .icon-sun {
+  display: block;
+}
+
+:root.dark .theme-toggle .icon-moon {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle {
+    transition: none;
+  }
 }
 
 /*
@@ -330,8 +416,8 @@ table {
   overflow-x: auto;
   margin: 1rem 0 1.4rem;
   border-collapse: collapse;
-  font-size: 0.92rem;
-  background: var(--bg-alt);
+  font-size: var(--text-sm);
+  background: var(--surface-raised);
   border: 1px solid var(--border);
   border-radius: 8px;
 }
@@ -345,8 +431,8 @@ td {
 }
 
 th {
-  background: var(--bg-subtle);
-  color: var(--highlight);
+  background: var(--surface-muted);
+  color: var(--text);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -362,9 +448,9 @@ blockquote {
   margin: 1.2rem 0;
   padding: 0.2rem 1.1rem;
   border-left: 3px solid var(--accent);
-  background: var(--bg-subtle);
+  background: var(--surface-muted);
   border-radius: 0 8px 8px 0;
-  color: var(--fg-muted);
+  color: var(--text-muted);
 }
 
 blockquote p {
@@ -385,18 +471,18 @@ blockquote p {
 .doc > h1:first-child + p,
 .doc > h1:first-child + p + p {
   text-align: center;
-  color: var(--fg-muted);
+  color: var(--text-muted);
   max-width: 600px;
   margin-left: auto;
   margin-right: auto;
 }
 
 .doc > h1:first-child + p {
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
 }
 
 .doc > h1:first-child + p + p {
-  font-size: 1.05rem;
+  font-size: var(--text-md);
   margin-bottom: 2rem;
 }
 
@@ -411,28 +497,32 @@ blockquote p {
 /*
    CODE BLOCK STYLING
 */
+/* Inline code reads as text on a tint, not as a link. There are ~180 spans of
+   it in the style guide; in accent green they all looked clickable. */
 code {
-  background: var(--code-bg);
-  color: var(--accent);
+  background: var(--surface-muted);
+  color: var(--text);
   padding: 0.15rem 0.4rem;
   border-radius: 4px;
-  font-size: 0.88rem;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
 }
 
 pre {
-  background: var(--code-bg);
+  background: var(--surface-muted);
   padding: 1.2rem;
   border-radius: 10px;
   overflow-x: auto;
   border: 1px solid var(--border);
-  line-height: 1.5;
+  font-family: var(--font-mono);
+  line-height: 1.55;
 }
 
 pre code {
   background: none;
   padding: 0;
-  color: var(--fg);
-  font-size: 0.85rem;
+  color: var(--text);
+  font-size: var(--text-sm);
 }
 
 /*
@@ -449,11 +539,10 @@ pre code {
    FOOTER
 */
 footer {
-  margin-top: 4rem;
+  margin-top: 2rem;
   padding: 1.5rem 0;
-  border-top: 1px solid var(--border);
-  font-size: 0.82rem;
-  color: var(--fg-muted);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
   text-align: center;
 }
 
@@ -464,8 +553,8 @@ footer {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  font-size: 0.88rem;
-  color: var(--fg-muted);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
   margin-bottom: 1rem;
 }
 
@@ -482,14 +571,10 @@ footer {
   }
 
   h1 {
-    font-size: 1.6rem;
+    font-size: var(--text-lg);
   }
 
   h2 {
-    font-size: 1.2rem;
-  }
-
-  .card {
-    padding: 1.2rem;
+    font-size: var(--text-md);
   }
 }

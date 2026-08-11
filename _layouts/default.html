@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ page.title | default: layout.title | default: site.title }}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+    />
+
+    <link rel="stylesheet" href="{{ '/theme.css' | relative_url }}" />
+
+    <!--
+      Runs before first paint so a dark-theme reader never sees a flash of the
+      light palette. With no saved choice, follow the operating system.
+    -->
+    <script>
+      (function () {
+        var saved = localStorage.getItem("theme");
+        var dark = saved
+          ? saved === "dark"
+          : window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (dark) document.documentElement.classList.add("dark");
+      })();
+    </script>
+  </head>
+
+  <body>
+    <div class="container">
+      {{ content }}
+
+      <footer>
+        © <span id="year"></span> Thanksgiving Point Exhibits Electronics Team
+      </footer>
+    </div>
+
+    <button class="theme-toggle" id="themeToggle" type="button">
+      <svg
+        class="icon icon-moon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.75"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+      </svg>
+      <svg
+        class="icon icon-sun"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.75"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="4.25" />
+        <path
+          d="M12 2.5v2M12 19.5v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2.5 12h2M19.5 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"
+        />
+      </svg>
+    </button>
+
+    <script>
+      const toggle = document.getElementById("themeToggle");
+      const root = document.documentElement;
+
+      // The button names what it will do, not what the page currently is.
+      function describe() {
+        toggle.setAttribute(
+          "aria-label",
+          root.classList.contains("dark")
+            ? "Switch to light theme"
+            : "Switch to dark theme",
+        );
+      }
+
+      describe();
+
+      toggle.addEventListener("click", () => {
+        const dark = root.classList.toggle("dark");
+        localStorage.setItem("theme", dark ? "dark" : "light");
+        describe();
+      });
+
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+  </body>
+</html>

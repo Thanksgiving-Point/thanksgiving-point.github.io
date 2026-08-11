@@ -1,71 +1,54 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      Thanksgiving Point Exhibits Electronics Team – Engineering Docs
-    </title>
+---
+layout: default
+title: Thanksgiving Point Exhibits Electronics Team – Engineering Docs
+---
 
-    <link rel="stylesheet" href="theme.css" />
-  </head>
+<header class="hero">
+  <div class="site-logo">
+    <img
+      src="{{ '/assets/tp-logo.png' | relative_url }}"
+      alt=""
+      width="88"
+      height="88"
+    />
+  </div>
 
-  <body>
-    <nav class="top-bar">
-      <a class="site-name" href="index.html">TP Electronics</a>
-      <button class="theme-toggle" id="themeToggle">
-        <span id="themeIcon">☀️</span> Theme
-      </button>
-    </nav>
+  <p class="eyebrow">Thanksgiving Point</p>
+  <h1>Exhibits Electronics Team</h1>
+  <p class="lede">
+    A growing collection of documentation, engineering standards, and tools for
+    building reliable, maintainable interactive exhibits.
+  </p>
+</header>
 
-    <div class="container">
-      <div class="hero">
-        <span class="leaf-accent"></span>
-        <h1>Exhibits Electronics Team</h1>
-        <p>
-          A growing collection of documentation, engineering standards, and
-          tools for building reliable, maintainable interactive exhibits.
-        </p>
-      </div>
+<h2 class="section-label">Documentation</h2>
 
-      <hr class="section-divider" />
-
-      <div class="card">
-        <h2 class="card-title">Software Style Guide</h2>
-        <p>
-          The lightweight C/C++ style conventions used across our exhibit
-          firmware. Meant for consistency and readability.
-        </p>
-        <a class="main-link" href="styleguide.html"> View the Style Guide →</a>
-      </div>
-
-      <footer>
-        © <span id="year"></span> Thanksgiving Point Exhibits Electronics Team
-      </footer>
+<div class="doc-index">
+  <!-- Each row: title, one-line summary, and the date it last changed.
+       Update the date when you revise the document. -->
+  <a class="doc-row" href="{{ '/styleguide.html' | relative_url }}">
+    <div class="doc-row-body">
+      <h3 class="doc-row-title">Software Style Guide</h3>
+      <p class="doc-row-summary">
+        Lightweight C/C++ style conventions used across our exhibit firmware.
+        Meant for consistency and readability.
+      </p>
     </div>
 
-    <script>
-      const root = document.documentElement;
-      const btn = document.getElementById("themeToggle");
-      const icon = document.getElementById("themeIcon");
-
-      function updateIcon() {
-        icon.textContent = root.classList.contains("dark") ? "🌙" : "☀️";
-      }
-
-      if (localStorage.getItem("theme") === "dark") {
-        root.classList.add("dark");
-      }
-      updateIcon();
-
-      btn.addEventListener("click", () => {
-        root.classList.toggle("dark");
-        const mode = root.classList.contains("dark") ? "dark" : "light";
-        localStorage.setItem("theme", mode);
-        updateIcon();
-      });
-
-      document.getElementById("year").textContent = new Date().getFullYear();
-    </script>
-  </body>
-</html>
+    <span class="doc-row-meta">
+      Updated Jul 2026
+      <svg
+        class="doc-row-arrow"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M5 12h13M12.5 5.5L19 12l-6.5 6.5" />
+      </svg>
+    </span>
+  </a>
+</div>

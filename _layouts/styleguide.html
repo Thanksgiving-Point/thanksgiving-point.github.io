@@ -1,55 +1,10 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Engineering Style Guide</title>
+---
+layout: default
+title: Engineering Style Guide
+---
 
-    <link rel="stylesheet" href="theme.css" />
-  </head>
+<a class="back-link" href="{{ '/' | relative_url }}">← Back to Home</a>
 
-  <body>
-    <nav class="top-bar">
-      <a class="site-name" href="index.html">TP Electronics</a>
-      <button class="theme-toggle" id="themeToggle">
-        <span id="themeIcon">☀️</span> Theme
-      </button>
-    </nav>
-
-    <div class="container">
-      <a class="back-link" href="index.html">← Back to Home</a>
-
-      <article class="doc">
-        {{ content }}
-      </article>
-
-      <footer>
-        © <span id="year"></span> Thanksgiving Point Exhibits Electronics Team
-      </footer>
-    </div>
-
-    <script>
-      const root = document.documentElement;
-      const btn = document.getElementById("themeToggle");
-      const icon = document.getElementById("themeIcon");
-
-      function updateIcon() {
-        icon.textContent = root.classList.contains("dark") ? "🌙" : "☀️";
-      }
-
-      if (localStorage.getItem("theme") === "dark") {
-        root.classList.add("dark");
-      }
-      updateIcon();
-
-      btn.addEventListener("click", () => {
-        root.classList.toggle("dark");
-        const mode = root.classList.contains("dark") ? "dark" : "light";
-        localStorage.setItem("theme", mode);
-        updateIcon();
-      });
-
-      document.getElementById("year").textContent = new Date().getFullYear();
-    </script>
-  </body>
-</html>
+<article class="doc">
+  {{ content }}
+</article>
