@@ -1,0 +1,19 @@
+title: TP Electronics
+description: >-
+  Engineering documentation for the Thanksgiving Point Exhibits Electronics
+  Team.
+
+# These match what GitHub Pages uses by default. They are spelled out so a
+# local `bundle exec jekyll serve` renders exactly what the live site does.
+markdown: kramdown
+kramdown:
+  input: GFM
+  # Must stay false: STYLEGUIDE.md wraps its paragraphs at 80 characters, and
+  # hard_wrap would turn every one of those line breaks into a <br>.
+  hard_wrap: false
+  syntax_highlighter: rouge
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor

@@ -297,19 +297,21 @@ li {
 
 /*
    CHECKLISTS
+   Class names come from kramdown's GFM parser, which turns "- [ ] item" into
+   ul.task-list > li.task-list-item.
 */
-.checklist {
+.task-list {
   list-style: none;
   padding-left: 0.2rem;
 }
 
-.checklist li {
+.task-list-item {
   display: flex;
   align-items: flex-start;
   gap: 0.55rem;
 }
 
-.checklist input[type="checkbox"] {
+.task-list-item-checkbox {
   margin: 0.45rem 0 0;
   accent-color: var(--accent);
   flex-shrink: 0;
@@ -317,15 +319,17 @@ li {
 
 /*
    TABLES
+   Markdown emits a bare <table> with no wrapper to hang a scroller on, so the
+   overflow lives on the table itself: max-content keeps narrow tables snug,
+   max-width stops a wide one from pushing the whole page sideways on a phone.
 */
-.table-wrap {
+table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
   overflow-x: auto;
   margin: 1rem 0 1.4rem;
-}
-
-table {
   border-collapse: collapse;
-  width: 100%;
   font-size: 0.92rem;
   background: var(--bg-alt);
   border: 1px solid var(--border);
@@ -368,12 +372,40 @@ blockquote p {
 }
 
 /*
-   VERSION LINE
+   MARKDOWN DOC BODY
+   STYLEGUIDE.md is rendered to HTML by Jekyll, which emits plain elements with
+   no classes to hook onto — so these rules work off document structure. The
+   first three blocks (title, version line, intro) stand in for the old .hero.
 */
-.version {
+.doc > h1:first-child {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.doc > h1:first-child + p,
+.doc > h1:first-child + p + p {
+  text-align: center;
   color: var(--fg-muted);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.doc > h1:first-child + p {
   font-size: 0.95rem;
-  margin-top: 0.4rem;
+}
+
+.doc > h1:first-child + p + p {
+  font-size: 1.05rem;
+  margin-bottom: 2rem;
+}
+
+/* Markdown "---" thematic breaks, matching .section-divider. */
+.doc hr {
+  border: none;
+  height: 1px;
+  background: var(--border);
+  margin: 2.5rem 0;
 }
 
 /*
