@@ -21,80 +21,537 @@
 
       <div class="hero">
         <span class="leaf-accent"></span>
-        <h1>Style Guide</h1>
+        <h1>
+          Thanksgiving Point Electronics Team - C++/Firmware Style Guide
+        </h1>
+        <p class="version"><strong>Version 2.0</strong> (2026-07-31)</p>
         <p>
-          Internal coding standards for Thanksgiving Point's exhibits firmware.
-          Aiming to keep our work readable, maintainable, and consistent as our
-          systems grow. Made with an emphasis on maintainability rather than
-          strict guidelines.
+          A lightweight, practical style guide for the embedded firmware used
+          across our exhibits. Designed for a small team: emphasis on clarity,
+          maintainability, and embedded best practices.
         </p>
       </div>
 
-      <h2>1. Repository Structure</h2>
+      <hr class="section-divider" />
+
+      <h2>1. Project &amp; File Organization</h2>
+
+      <h3>1.1 Repository layout</h3>
+      <p>
+        One repo per exhibit interactive. One directory per microcontroller
+        <strong>node</strong>, named after the node's <em>role</em>, not its
+        chip (projects routinely end up with two boards of the same type).
+      </p>
+
+      <pre><code>exhibit-name/
+├── .clangd                  # editor/LSP support only, not the build
+├── .gitignore
+├── README.md                # see §8.4
+├── STYLEGUIDE.md            # this file, or a link to it
+├── docs/                    # schematics, diagrams, photos
+├── sensor-controller/       # a node, named by role
+│   ├── sensor-controller.ino
+│   ├── sketch.yaml
+│   └── src/
+│       ├── App.h / App.cpp  # coordinates subsystems (§1.2)
+│       ├── Config.h
+│       ├── Debug.h
+│       └── ...
+│   └── build/               # for local build files, included in .gitignore
+└── led-driver/              # single-subsystem node: no App needed (§1.2)</code></pre>
+
+      <p>
+        The sketch folder and the <code>.ino</code> file must share a name -
+        <code>arduino-cli</code> requires it.
+      </p>
+
+      <h3>1.2 The <code>.ino</code> sketch stays thin</h3>
+      <p>
+        Real logic lives in <code>src/</code> classes. The <code>.ino</code>
+        handles bring-up - it starts <code>Serial</code>, starts buses
+        (<code>Wire.h</code>), and hands off the rest.
+      </p>
+
+      <p>
+        When a node coordinates two or more stateful subsystems, or runs a state
+        machine spanning them, consider a central <code>App</code> class to own
+        that coordination. Simpler nodes don't need it -
+        <code>setup()</code>/<code>loop()</code> can call into
+        <code>src/</code> classes directly. A <code>.ino</code> growing past
+        ~100 lines is the signal.
+      </p>
+
+      <pre><code>#include &lt;Wire.h&gt;
+#include "src/App.h"
+
+App app;
+
+void setup() {
+  Serial.begin(115200);
+  Wire.begin();
+  app.setup();
+}
+
+void loop() { app.loopOnce(); }</code></pre>
+
+      <blockquote>
+        <p>
+          See the <code>esp32/</code> node in <code>piston-interactive</code>
+          for an example of an <code>App</code> class.
+        </p>
+      </blockquote>
+
+      <hr class="section-divider" />
+
+      <h2>2. Naming Conventions</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Kind</th>
+              <th>Convention</th>
+              <th>Example</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Local variables, parameters</td>
+              <td><code>snake_case</code></td>
+              <td><code>elapsed_time</code>, <code>raw_reading</code></td>
+            </tr>
+            <tr>
+              <td>Member variables</td>
+              <td><code>snake_case_</code> (trailing underscore)</td>
+              <td><code>rpm_</code>, <code>error_count_</code></td>
+            </tr>
+            <tr>
+              <td>Functions &amp; methods</td>
+              <td><code>camelCase</code></td>
+              <td><code>beginPWM()</code>, <code>decayRPM()</code></td>
+            </tr>
+            <tr>
+              <td>Classes, structs, types</td>
+              <td><code>PascalCase</code></td>
+              <td><code>EngineModel</code>, <code>LedOutput</code></td>
+            </tr>
+            <tr>
+              <td>Enum types</td>
+              <td>
+                <code>PascalCase</code>, always <code>enum class</code> with an
+                explicit underlying type
+              </td>
+              <td><code>enum class PistonSize : uint8_t</code></td>
+            </tr>
+            <tr>
+              <td>Enum values</td>
+              <td><code>UPPER_SNAKE_CASE</code></td>
+              <td><code>SMALL</code>, <code>ERROR_RECOVERY</code></td>
+            </tr>
+            <tr>
+              <td>Constants (<code>constexpr</code>)</td>
+              <td><code>UPPER_SNAKE_CASE</code></td>
+              <td><code>MAX_VALID_MM</code></td>
+            </tr>
+            <tr>
+              <td>Namespaces</td>
+              <td><code>snake_case</code></td>
+              <td><code>config</code>, <code>motion_detection</code></td>
+            </tr>
+            <tr>
+              <td>Macros</td>
+              <td><code>UPPER_SNAKE_CASE</code></td>
+              <td><code>DEBUG_PRINTLN</code></td>
+            </tr>
+            <tr>
+              <td>Files</td>
+              <td>Match the primary class</td>
+              <td><code>EngineModel.h</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>2.1 Units in names</h3>
+      <p>
+        Any constant or variable carrying a physical quantity names its unit.
+        This is the cheapest bug prevention in the guide - a <code>_MS</code>
+        next to a <code>_US</code> catches mistakes that types can't.
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Suffix</th>
+              <th>Meaning</th>
+              <th>Suffix</th>
+              <th>Meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>_MS</code>, <code>_US</code>, <code>_S</code></td>
+              <td>time</td>
+              <td><code>_MM</code>, <code>_CM</code></td>
+              <td>distance</td>
+            </tr>
+            <tr>
+              <td><code>_HZ</code></td>
+              <td>frequency</td>
+              <td><code>_PIN</code></td>
+              <td>GPIO number</td>
+            </tr>
+            <tr>
+              <td><code>_PCT</code></td>
+              <td>percentage</td>
+              <td><code>_BITS</code></td>
+              <td>bit width</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>
+        Examples: <code>TIMEOUT_MS</code>, <code>PULSE_US</code>,
+        <code>MAX_VALID_MM</code>, <code>PWM_FREQ_HZ</code>,
+        <code>TORQUE_LED_PIN</code>.
+      </p>
+
+      <hr class="section-divider" />
+
+      <h2>3. Class Design</h2>
+
+      <h3>3.1 Header-only vs. header + implementation</h3>
+      <p>
+        <strong>Split into <code>.h</code>/<code>.cpp</code></strong> when
+        either is true:
+      </p>
+
       <ul>
         <li>
-          <code>./</code> - Main .ino sketch, README.md, (optional sketch.yaml
-          and .clangd)
+          The class touches a peripheral - GPIO, I2C, SPI, PWM, ADC, interrupts.
+          (<code>millis()</code> and <code>micros()</code> don't count.)
         </li>
-        <li><code>src/</code> — All firmware source files (.cpp, .h)</li>
         <li>
-          <code>docs/</code> — Schematics, power notes, maintenance notes,
-          troubleshooting guides
+          The implementation is long or has non-trivial private helpers, roughly
+          past 100 lines.
         </li>
-        <li>No per-class subfolders (for Arduino IDE compatibility)</li>
       </ul>
 
-      <h2>2. File Header Template</h2>
+      <p>
+        <strong>Otherwise keep it header-only:</strong> small, pure-logic
+        classes like filters, timers, debouncers, and health monitors. Define
+        methods inside the class body so they're implicitly <code>inline</code>
+        - keep those definitions to trivial getters, single-line logic, and
+        small math helpers.
+      </p>
 
-      <h3>2.1 Main <code>.ino</code> file</h3>
-      <pre><code>/**
-* Project: &lt;project/interactive title&gt;
-* File: &lt;filename&gt;
-* Description: &lt;short description of this file&gt;
-*
-* Author: &lt;name&gt;
-* Date: &lt;mm-dd-yy&gt;
-* Hardware: &lt;board and hardware used&gt;
-* Notes: &lt;dependencies, pin usage, modules, quirks, etc.&gt;
-*
-* (c) Thanksgiving Point Exhibits Electronics Team — &lt;year&gt;
-*/</code></pre>
+      <p>Templates must be header-only - they can't be split.</p>
 
-      <h3>2.2 Header <code>.h</code> files</h3>
-      <pre><code>/**
- * &lt;class_name&gt;
+      <h3>3.2 Other class design notes</h3>
+      <ul>
+        <li>Use <code>#pragma once</code> at the top of every header.</li>
+        <li>
+          <strong>Static methods:</strong> use <code>static</code> if the method
+          does not access instance state and conceptually belongs to the class.
+          A class with no members at all is a sign the methods should be
+          <code>static</code>.
+        </li>
+        <li>Keep single responsibility per class.</li>
+        <li>Mark every method that doesn't mutate state <code>const</code>.</li>
+        <li>
+          Initialize members at the point of declaration, not in the constructor
+          body.
+        </li>
+      </ul>
+
+      <h3>3.3 Hardware-owning classes are non-copyable</h3>
+      <p>
+        Any class that owns a peripheral, a buffer, or an ISR registration must
+        delete copy construction and assignment. Copying a driver produces two
+        objects that each believe they exclusively own one piece of hardware,
+        and the resulting bugs are subtle and intermittent.
+      </p>
+
+      <pre><code>class ToFSensor {
+public:
+  ToFSensor() = default;
+  ToFSensor(const ToFSensor &amp;) = delete;
+  ToFSensor &amp;operator=(const ToFSensor &amp;) = delete;
+  // ...
+};</code></pre>
+
+      <p>
+        To re-initialize hardware, call <code>configure()</code> again on the
+        existing object. Never construct a replacement and assign over the
+        original.
+      </p>
+
+      <hr class="section-divider" />
+
+      <h2>4. Error Handling &amp; Robustness</h2>
+
+      <ul>
+        <li>
+          Track errors with counters / boolean flags and recovery timers (use
+          <code>millis()</code>).
+        </li>
+        <li>
+          Provide <code>begin()</code>, <code>init()</code>, or
+          <code>configure()</code> methods where appropriate. These return
+          <code>bool</code>, and
+          <strong>callers must check the result</strong>.
+        </li>
+        <li>
+          Saturate error counters so they can't wrap:
+          <code>if (count_ &lt; 255) ++count_;</code>
+        </li>
+      </ul>
+
+      <h3>4.1 Exhibits never halt</h3>
+      <p>
+        An exhibit that hangs stays dark until someone notices. An exhibit that
+        retries usually fixes itself before opening. Never
+        <code>while (1) {}</code>, never block forever waiting on a peripheral,
+        never let a failed sensor stop the main loop.
+      </p>
+
+      <p>
+        Failure handling is a state, not a stop: enter a recovery state, retry
+        on a timer, and keep looping. Degrade to a sensible default output
+        rather than freezing the last value or going black.
+      </p>
+
+      <h3>4.2 Startup banner</h3>
+      <p>
+        Print identity on boot. When a unit misbehaves in the gallery, a laptop
+        and a serial terminal should identify exactly what's flashed on it in
+        ten seconds.
+      </p>
+
+      <pre><code>DEBUG_PRINTLN("Piston Interactive - sensor-controller");
+DEBUG_PRINTF("build: %s %s | variant: SMALL\n", __DATE__, __TIME__);</code></pre>
+
+      <p>
+        This matters most when one codebase ships in several physical
+        configurations (§5.2).
+      </p>
+
+      <hr class="section-divider" />
+
+      <h2>5. <code>Config.h</code> - Global Constants, Namespaces, and
+        Utilities</h2>
+
+      <ul>
+        <li>
+          Place all tunables in <code>config::</code> as <code>constexpr</code>,
+          in one <code>Config.h</code> per node.
+        </li>
+        <li>Avoid polluting the global namespace.</li>
+        <li>Name constants with units where relevant (§2.1).</li>
+        <li>
+          Group related constants under a
+          <code>// ----- SECTION -----</code> comment.
+        </li>
+        <li>
+          <code>config::</code> may include very small pure helpers like
+          <code>static inline float clampf(...)</code>.
+        </li>
+        <li>
+          No magic numbers in logic files. If a literal has meaning, it's a
+          constant.
+        </li>
+        <li>
+          Small utility helpers may live in <code>util::</code> or
+          <code>config::</code> as <code>static inline</code> functions.
+        </li>
+        <li>
+          Do <strong>not</strong> place medium/large logic or hardware code in
+          utility headers.
+        </li>
+      </ul>
+
+      <h3>5.1 Derived values are constants too</h3>
+      <p>
+        Anything computed from another constant belongs in
+        <code>Config.h</code> with a name, not inline at the call site. An
+        unnamed expression in a loop is a value nobody can search for.
+      </p>
+
+      <pre><code>// Good
+constexpr uint32_t SENSOR_POLL_MS = TIMING_BUDGET_US / 1000;
+if (now - last_read_ms_ &gt;= config::SENSOR_POLL_MS) { ... }
+
+// Avoid
+if (now - last_read_ms_ &gt;= config::TIMING_BUDGET_US / 1000) { ... }</code></pre>
+
+      <h3>5.2 Per-installation variants</h3>
+      <p>
+        When one codebase ships to several physical units with different
+        constants, mark the variant loudly at the top of <code>Config.h</code>,
+        keep it to a <em>single</em> switch, and print it at boot (§4.2).
+      </p>
+
+      <pre><code>// ===== SET PER INSTALLATION - see README "Deployment" =====
+constexpr PistonSize DISPLAY_TYPE = PistonSize::SMALL;</code></pre>
+
+      <p>
+        Tag each deployment with its variant (§10.2) so the repo records what's
+        on which unit.
+      </p>
+
+      <h3>5.3 Pins</h3>
+      <p>
+        All pin numbers live in <code>Config.h</code> with a
+        <code>_PIN</code> suffix. Never a bare GPIO number in logic code. Keep
+        the pin block in sync with the README pinout table.
+      </p>
+
+      <hr class="section-divider" />
+
+      <h2>6. Embedded Best Practices</h2>
+
+      <ul>
+        <li>
+          No dynamic allocation - no <code>new</code>, no <code>malloc</code>,
+          no Arduino <code>String</code>. Use fixed-size arrays and stack
+          allocation, with sizes from <code>constexpr</code> values or template
+          parameters.
+        </li>
+        <li>
+          No blocking calls in the main loop - no <code>delay()</code>, use
+          non-blocking timing. <code>delay()</code> in <code>setup()</code> for
+          hardware settling is fine.
+        </li>
+        <li>
+          Use <code>&lt;stdint.h&gt;</code> types with explicit width
+          (<code>uint8_t</code>, <code>uint32_t</code>), not <code>int</code> or
+          <code>unsigned long</code> - their widths vary by platform.
+          <code>uint32_t</code> for timestamps, <code>size_t</code> for sizes
+          and indices.
+        </li>
+        <li>
+          Use <code>float</code>, not <code>double</code> - most embedded FPUs
+          are single-precision, so <code>double</code> math is emulated in
+          software. Suffix literals with <code>f</code> (<code>0.5f</code>) and
+          use the <code>f</code> variants of math functions
+          (<code>fabsf</code>, <code>sqrtf</code>, <code>sinf</code>); an
+          unsuffixed literal or a <code>double</code> function silently promotes
+          the whole expression.
+        </li>
+        <li>
+          String literals are ASCII only - typographic characters are multi-byte
+          UTF-8 and render unpredictably on serial terminals. They're fine in
+          comments. On AVR, wrap literals in <code>F()</code> to keep them in
+          flash.
+        </li>
+      </ul>
+
+      <h3>6.1 Timing must be rollover-safe</h3>
+      <p>
+        <code>millis()</code> wraps about every 49.7 days,
+        <code>micros()</code> every 71 minutes. Always
+        <strong>subtract</strong> timestamps; never add to one and compare.
+      </p>
+
+      <pre><code>// Good - correct across rollover
+if (now - last_update_ms_ &gt;= config::UPDATE_PERIOD_MS) { ... }
+
+// Broken - fails once the counter wraps
+if (now &gt; last_update_ms_ + config::UPDATE_PERIOD_MS) { ... }</code></pre>
+
+      <p>
+        Capture <code>millis()</code> once at the top of a function and reuse
+        it, so every comparison in that pass shares one time base.
+      </p>
+
+      <h3>6.2 Interrupts</h3>
+      <ul>
+        <li>Keep ISRs minimal; defer work to the main loop or tasks.</li>
+        <li>On ESP32, mark ISRs <code>IRAM_ATTR</code>.</li>
+        <li>
+          Every variable shared between an ISR and the main loop is
+          <code>volatile</code>.
+        </li>
+        <li>
+          In an ISR: no <code>Serial</code>, no <code>delay()</code>, no
+          allocation, no floating-point math. Set a flag, store a timestamp,
+          return.
+        </li>
+        <li>
+          Snapshot shared state into locals inside a critical section before
+          using it - a multi-byte <code>volatile</code> read can tear.
+        </li>
+      </ul>
+
+      <pre><code>if (new_data_available) {
+  noInterrupts();
+  uint32_t safe_pulse_width = pulse_width;
+  uint32_t safe_period = period_length;
+  new_data_available = false;
+  interrupts();
+  // ... work on the local copies
+}</code></pre>
+
+      <hr class="section-divider" />
+
+      <h2>7. Debug &amp; Logging</h2>
+
+      <p>
+        Every project carries the same <code>Debug.h</code> so log statements
+        compile out of a release build. Copy it verbatim; if it needs to change,
+        change it everywhere.
+      </p>
+
+      <pre><code>#pragma once
+/**
+ * Debug.h
  *
- * &lt;descriptive one-liner and list if necessary&gt;
- * Trigger-based audio playback for MKR Zero.
- * - Exposes play()
- * - Manages busy state and pulse timing
- * - Non-blocking update() method
+ * Debug logging macros. Set DEBUG_LEVEL to 0 to compile out all output.
+ */
+
+#ifndef DEBUG_LEVEL
+#define DEBUG_LEVEL 1
+#endif
+
+#if DEBUG_LEVEL &gt;= 1
+#define DEBUG_PRINT(...) Serial.print(__VA_ARGS__)
+#define DEBUG_PRINTLN(...) Serial.println(__VA_ARGS__)
+#define DEBUG_PRINTF(...) Serial.printf(__VA_ARGS__)
+#else
+#define DEBUG_PRINT(...)
+#define DEBUG_PRINTLN(...)
+#define DEBUG_PRINTF(...)
+#endif</code></pre>
+
+      <p>
+        Use the macros in class code, never bare <code>Serial.print</code> -
+        bare calls can't be compiled out and slow a release build's main loop.
+      </p>
+
+      <hr class="section-divider" />
+
+      <h2>8. Documentation &amp; Comments</h2>
+
+      <h3>8.1 File header</h3>
+      <p>Every <code>.h</code> begins with:</p>
+
+      <pre><code>#pragma once
+/**
+ * FileName.h
+ *
+ * Small one paragraph max description with bullet points if necessary.
  */</code></pre>
 
-      <h2>3. Naming Conventions</h2>
-
-      <h3>3.1 Variables</h3>
-      <ul>
-        <li>Local variables: <code>snake_case</code></li>
-        <li>
-          Member variables: <code>snake_case_</code> (trailing underscore)
-        </li>
-        <li>Global constants: <code>SCREAMING_SNAKE_CASE</code></li>
-      </ul>
-
-      <h3>3.2 Types</h3>
-      <ul>
-        <li>Classes: <code>PascalCase</code></li>
-        <li>Structs: <code>PascalCase</code></li>
-        <li>Enum types: <code>PascalCase</code></li>
-        <li>Enum values: <code>kEnumName</code></li>
-      </ul>
-
-      <h2>4. Functions and Methods</h2>
-
-      <h3>4.1 Documentation</h3>
       <p>
-        Each function includes a one-line summary + parameters + return value.
+        The filename in the header must match the actual filename.
+        <code>.cpp</code> files don't repeat the block.
+      </p>
+
+      <h3>8.2 Function documentation</h3>
+      <p>
+        Short Doxygen-style header with brief description, params, and return:
       </p>
 
       <pre><code>/**
@@ -106,65 +563,232 @@
  */
 bool camelCase(int param);</code></pre>
 
-      <h3>4.2 Formatting</h3>
+      <p>
+        <strong
+          >The block goes on the declaration in the <code>.h</code></strong
+        >, for header-only and split classes alike - that's the file a caller
+        reads. The <code>.cpp</code> gets implementation comments only.
+      </p>
+
+      <p>
+        Document every public method; include <code>@param</code> and
+        <code>@return</code> where they add something the signature doesn't.
+        Private helpers get a one-line <code>//</code> comment or nothing.
+      </p>
+
+      <h3>8.3 Inline comments</h3>
+      <p>
+        Explain <em>why</em>, not <em>what</em> - hardware quirks, timing
+        constraints, non-obvious math or logic. Use <code>// NOTE:</code> for
+        context a reader needs and <code>// TODO:</code> for known gaps, rarely
+        enough that both stay greppable.
+      </p>
+
+      <h3>8.4 README</h3>
+      <p>Every exhibit repo's README covers, at minimum:</p>
+
       <ul>
-        <li>2-space indentation (clang-format)</li>
-        <li>Automatic formatting required before commits</li>
         <li>
-          Line length: determined by clang-format (typically 100–120 chars)
+          <strong>Overview</strong> - what the exhibit does, from a visitor's
+          point of view
+        </li>
+        <li>
+          <strong>Hardware</strong> - boards, sensors, drivers, with links and a
+          wiring diagram
+        </li>
+        <li>
+          <strong>Pinout</strong> - a table, matching <code>Config.h</code>
+        </li>
+        <li>
+          <strong>Build &amp; Flash</strong> - exact
+          <code>arduino-cli</code> commands, board package version, and pinned
+          library versions
+        </li>
+        <li>
+          <strong>Deployment</strong> - which variants exist, which unit gets
+          which build (§5.2)
+        </li>
+        <li>
+          <strong>Maintenance</strong> - symptoms, likely causes, how to
+          recover. Write it for a technician who has never seen the code. This
+          is the highest-value section in the repo.
         </li>
       </ul>
 
-      <h2>5. Inline Comments</h2>
       <p>
-        Inline comments are encouraged when clarity is needed. But avoid stating
-        obvious behavior. Best used to:
+        Multi-class nodes also get an <strong>Architecture</strong> section: one
+        short paragraph per class, purpose and key methods.
       </p>
 
+      <hr class="section-divider" />
+
+      <h2>9. Formatting</h2>
+
       <ul>
-        <li>Explain <em>why</em> something is done, not just what it does</li>
+        <li>Indentation: 2 spaces.</li>
+        <li>Line length: prefer ≤ 80 chars (LLVM default).</li>
         <li>
-          Capture hardware/software quirks, timing constraints, or electrical
-          considerations
+          Braces on same line, and <strong>always braced</strong> — even
+          single-statement bodies.
+        </li>
+        <li>One statement per line.</li>
+      </ul>
+
+      <pre><code>if (cond) {
+  ...
+}</code></pre>
+
+      <p>
+        Beyond those four rules, formatting is left to you. Use whatever your
+        editor does, keep it consistent within a file, and match the surrounding
+        code. We may adopt an automatic formatter later; for now the setup cost
+        isn't worth it.
+      </p>
+
+      <p>
+        Don't reformat code you aren't otherwise editing — a diff full of
+        whitespace changes hides the change that actually matters.
+      </p>
+
+      <hr class="section-divider" />
+
+      <h2>10. Git &amp; Repository Conventions</h2>
+
+      <h3>10.1 Commits</h3>
+      <p>
+        Short imperative subject, 72 characters or less. If it needs a comma or
+        an "as well as", the rest belongs in the body.
+      </p>
+
+      <pre><code>fix: remove blocking delay from the main loop
+
+App polls the sensor on a timer now, so the 15 ms delay was capping the
+update rate for no reason.</code></pre>
+
+      <p>
+        Prefixes keep <code>git log --oneline</code> skimmable:
+        <code>feat</code>, <code>fix</code>, <code>docs</code>,
+        <code>style</code>, <code>chore</code>. A <code>style:</code> commit
+        contains no functional change, so it's safe to skim past when reviewing
+        what actually shipped.
+      </p>
+
+      <h3>10.2 Tag every deployment</h3>
+      <p>
+        The repo must always be able to answer "what is running on that
+        exhibit?" Tag at the moment of flashing, one tag per unit when variants
+        differ (§5.2).
+      </p>
+
+      <pre><code>git tag -a deploy/2026-07-31-small -m "flashed to small piston unit"
+git push --tags</code></pre>
+
+      <h3>10.3 Repo hygiene</h3>
+      <ul>
+        <li>
+          <code>main</code> always compiles. Branch (<code>feat/…</code>,
+          <code>fix/…</code>) when a change is risky or spans more than one
+          sitting; otherwise commit straight to <code>main</code>.
+        </li>
+        <li>
+          <code>.gitignore</code> build artifacts (<code>**/build</code>). Never
+          ignore source or docs.
+        </li>
+        <li>
+          <code>sketch.yaml</code> commits <code>default_fqbn</code>.
+          <code>default_port</code> differs per machine - edit it locally, don't
+          commit the churn.
+        </li>
+        <li>
+          Keep working copies out of cloud-sync folders (OneDrive, Dropbox).
+          Syncing a <code>.git</code> directory corrupts it; GitHub is the
+          backup.
+        </li>
+        <li>
+          One-time setup:
+          <code>git config --global user.email you@thanksgivingpoint.org</code>,
+          <code>git config --global pull.rebase true</code>.
         </li>
       </ul>
 
-      <p>
-        Comment density is not strictly defined — use good judgment and err on
-        the side of clarity.
-      </p>
+      <hr class="section-divider" />
 
-      <h2>6. File Organization</h2>
-      <ul>
-        <li>Headers (<code>.h</code>): declarations + short inline methods</li>
-        <li>Sources (<code>.cpp</code>): implementations</li>
-        <li>Pin maps and constants go in <code>Config.h</code></li>
-      </ul>
+      <h2>Appendix: Checklists</h2>
 
-      <h2>7. Versioning and Tags</h2>
-      <p>Use descriptive tags for major milestones:</p>
-
-      <pre><code>v0.9-mkrzero-i2s-final
-v1.0-sound-module-refactor</code></pre>
-
-      <h2>8. Hardware Documentation</h2>
-      <ul>
-        <li>Wiring diagrams and connector references</li>
-        <li>Power calculations and component ratings</li>
-        <li>Startup/reset quirks</li>
-        <li>Calibration instructions</li>
-        <li>PDF schematics (if available)</li>
-      </ul>
-
-      <h2>9. README.md Template</h2>
-      <ul>
-        <li>Overview (5–10 sentences)</li>
-        <li>Hardware list</li>
-        <li>Wiring diagram</li>
-        <li>Software architecture summary</li>
+      <h3>New project</h3>
+      <ul class="checklist">
         <li>
-          Important troubleshooting, warnings, known issues, future
-          improvements, any important context for anyone reading the project
+          <input type="checkbox" disabled /> Node directories named by role, not
+          by chip
+        </li>
+        <li>
+          <input type="checkbox" disabled /> <code>.clangd</code> and
+          <code>.gitignore</code> present
+        </li>
+        <li>
+          <input type="checkbox" disabled /> <code>Debug.h</code> copied
+          unmodified
+        </li>
+        <li>
+          <input type="checkbox" disabled /> README skeleton filled in,
+          including Pinout and Maintenance
+        </li>
+        <li>
+          <input type="checkbox" disabled /> Startup banner prints name, build
+          date, and variant
+        </li>
+      </ul>
+
+      <h3>Before every commit</h3>
+      <ul class="checklist">
+        <li>
+          <input type="checkbox" disabled /> No magic numbers; new constants are
+          in <code>Config.h</code> with units
+        </li>
+        <li>
+          <input type="checkbox" disabled /> Time comparisons subtract rather
+          than add
+        </li>
+        <li>
+          <input type="checkbox" disabled /> No <code>delay()</code> outside
+          <code>setup()</code>
+        </li>
+        <li><input type="checkbox" disabled /> No dynamic allocation</li>
+        <li>
+          <input type="checkbox" disabled /> <code>@brief</code> on new public
+          methods, in the <code>.h</code>
+        </li>
+        <li>
+          <input type="checkbox" disabled /> File header filename matches the
+          actual filename
+        </li>
+        <li>
+          <input type="checkbox" disabled /> Compiles clean
+          (<code>arduino-cli compile</code>)
+        </li>
+        <li>
+          <input type="checkbox" disabled /> README updated if hardware, pins,
+          or deployment changed
+        </li>
+        <li>
+          <input type="checkbox" disabled /> Commit subject is imperative and
+          under 72 characters
+        </li>
+      </ul>
+
+      <h3>Before every deployment</h3>
+      <ul class="checklist">
+        <li>
+          <input type="checkbox" disabled /> Correct variant set in
+          <code>Config.h</code> for this physical unit
+        </li>
+        <li>
+          <input type="checkbox" disabled /> Verified on the bench, then in
+          place
+        </li>
+        <li>
+          <input type="checkbox" disabled />
+          <code>deploy/YYYY-MM-DD[-variant]</code> tag pushed
         </li>
       </ul>
 

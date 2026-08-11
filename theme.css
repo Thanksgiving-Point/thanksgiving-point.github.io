@@ -296,6 +296,87 @@ li {
 }
 
 /*
+   CHECKLISTS
+*/
+.checklist {
+  list-style: none;
+  padding-left: 0.2rem;
+}
+
+.checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+}
+
+.checklist input[type="checkbox"] {
+  margin: 0.45rem 0 0;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+
+/*
+   TABLES
+*/
+.table-wrap {
+  overflow-x: auto;
+  margin: 1rem 0 1.4rem;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.92rem;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+th {
+  background: var(--bg-subtle);
+  color: var(--highlight);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/*
+   BLOCKQUOTE
+*/
+blockquote {
+  margin: 1.2rem 0;
+  padding: 0.2rem 1.1rem;
+  border-left: 3px solid var(--accent);
+  background: var(--bg-subtle);
+  border-radius: 0 8px 8px 0;
+  color: var(--fg-muted);
+}
+
+blockquote p {
+  color: inherit;
+}
+
+/*
+   VERSION LINE
+*/
+.version {
+  color: var(--fg-muted);
+  font-size: 0.95rem;
+  margin-top: 0.4rem;
+}
+
+/*
    CODE BLOCK STYLING
 */
 code {
