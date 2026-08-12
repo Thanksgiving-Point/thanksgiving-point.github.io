@@ -3,7 +3,7 @@ layout: styleguide
 permalink: /styleguide.html
 ---
 
-# Thanksgiving Point Electronics Team - C++/Firmware Style Guide
+# C++/Firmware Style Guide
 
 **Version 2.0** (2026-07-31)
 
@@ -14,8 +14,8 @@ Designed for a small team: emphasis on clarity, maintainability, and embedded be
 
 ### 1.1 Repository layout
 
-One repo per exhibit interactive. One directory per microcontroller **node**, named after
-the node's _role_, not its chip (projects routinely end up with two boards of
+One repo per exhibit interactive. One directory per microcontroller **sketch**, named after
+the sketch's _role_, not its chip (projects routinely end up with two boards of
 the same type).
 
 ```
@@ -24,7 +24,7 @@ exhibit-name/
 ├── .gitignore
 ├── README.md                # see §8.4
 ├── docs/                    # schematics, diagrams, photos
-├── sensor-controller/       # a node, named by role
+├── sensor-controller/       # a sketch, named by role
 │   ├── sensor-controller.ino
 │   ├── sketch.yaml
 │   └── src/
@@ -33,7 +33,7 @@ exhibit-name/
 │       ├── Debug.h
 │       └── ...
 │   └── build/               # for local build files, included in .gitignore
-└── led-driver/              # single-subsystem node: no App needed (§1.2)
+└── led-driver/              # another mcu sketch
 ```
 
 The sketch folder and the `.ino` file must share a name - `arduino-cli`
@@ -41,30 +41,15 @@ requires it.
 
 ### 1.2 The `.ino` sketch stays thin
 
-Real logic lives in `src/` classes. The `.ino` handles bring-up - it starts
-`Serial`, starts buses (`Wire.h`), and hands off the rest.
+Real logic lives in `src/` classes. The `.ino` handles bring-up in the `setup()` function - it starts
+`Serial`, starts buses (`Wire.h`), and hands off the rest in the `loop()` function.
 
-When a node coordinates two or more stateful subsystems, or runs a state
+If a sketch coordinates two or more stateful subsystems, or runs a state
 machine spanning them, consider a central `App` class to own that coordination.
-Simpler nodes don't need it - `setup()`/`loop()` can call into `src/` classes
-directly. A `.ino` growing past ~100 lines is the signal.
+Simpler sketches don't need it - `setup()`/`loop()` can call into `src/` classes
+directly.
 
-```cpp
-#include <Wire.h>
-#include "src/App.h"
-
-App app;
-
-void setup() {
-  Serial.begin(115200);
-  Wire.begin();
-  app.setup();
-}
-
-void loop() { app.loopOnce(); }
-```
-
-> See the `esp32/` node in `piston-interactive` for an example of an `App`
+> See the `esp32/` sketch in `piston-interactive` for an example of an `App`
 > class.
 
 ## 2. Naming Conventions
@@ -88,12 +73,6 @@ Any constant or variable carrying a physical quantity names its unit. This is
 the cheapest bug prevention in the guide - a `_MS` next to a `_US` catches
 mistakes that types can't.
 
-| Suffix             | Meaning    | Suffix       | Meaning     |
-| ------------------ | ---------- | ------------ | ----------- |
-| `_MS`, `_US`, `_S` | time       | `_MM`, `_CM` | distance    |
-| `_HZ`              | frequency  | `_PIN`       | GPIO number |
-| `_PCT`             | percentage | `_BITS`      | bit width   |
-
 Examples: `TIMEOUT_MS`, `PULSE_US`, `MAX_VALID_MM`, `PWM_FREQ_HZ`, `TORQUE_LED_PIN`.
 
 ## 3. Class Design
@@ -102,17 +81,14 @@ Examples: `TIMEOUT_MS`, `PULSE_US`, `MAX_VALID_MM`, `PWM_FREQ_HZ`, `TORQUE_LED_P
 
 **Split into `.h`/`.cpp`** when either is true:
 
-- The class touches a peripheral - GPIO, I2C, SPI, PWM, ADC, interrupts.
-  (`millis()` and `micros()` don't count.)
-- The implementation is long or has non-trivial private helpers, roughly past
-  100 lines.
+- The class touches a peripheral - GPIO, I2C, SPI, PWM, ADC, interrupts
+  (`millis()` and `micros()` don't count)
+- The implementation is long or has non-trivial private helpers
 
 **Otherwise keep it header-only:** small, pure-logic classes like filters,
 timers, debouncers, and health monitors. Define methods inside the class body
 so they're implicitly `inline` - keep those definitions to trivial getters,
 single-line logic, and small math helpers.
-
-Templates must be header-only - they can't be split.
 
 ### 3.2 Other class design notes
 
@@ -217,11 +193,6 @@ constexpr PistonSize DISPLAY_TYPE = PistonSize::SMALL;
 Tag each deployment with its variant (§10.2) so the repo records what's on
 which unit.
 
-### 5.3 Pins
-
-All pin numbers live in `Config.h` with a `_PIN` suffix. Never a bare GPIO
-number in logic code. Keep the pin block in sync with the README pinout table.
-
 ## 6. Embedded Best Practices
 
 - No dynamic allocation - no `new`, no `malloc`, no Arduino `String`. Use
@@ -237,9 +208,6 @@ number in logic code. Keep the pin block in sync with the README pinout table.
   use the `f` variants of math functions (`fabsf`, `sqrtf`, `sinf`); an
   unsuffixed literal or a `double` function silently promotes the whole
   expression.
-- String literals are ASCII only - typographic characters are multi-byte UTF-8
-  and render unpredictably on serial terminals. They're fine in comments. On
-  AVR, wrap literals in `F()` to keep them in flash.
 
 ### 6.1 Timing must be rollover-safe
 
@@ -259,11 +227,10 @@ comparison in that pass shares one time base.
 
 ### 6.2 Interrupts
 
-- Keep ISRs minimal; defer work to the main loop or tasks.
+- Keep ISRs minimal (set a flag, record a timestamp); defer more complex work to the main loop or tasks.
 - On ESP32, mark ISRs `IRAM_ATTR`.
 - Every variable shared between an ISR and the main loop is `volatile`.
 - In an ISR: no `Serial`, no `delay()`, no allocation, no floating-point math.
-  Set a flag, store a timestamp, return.
 - Snapshot shared state into locals inside a critical section before using it -
   a multi-byte `volatile` read can tear.
 
@@ -343,8 +310,7 @@ bool camelCase(int param);
 ```
 
 **The block goes on the declaration in the `.h`**, for header-only and split
-classes alike - that's the file a caller reads. The `.cpp` gets implementation
-comments only.
+classes alike.
 
 Document every public method; include `@param` and `@return` where they add
 something the signature doesn't. Private helpers get a one-line `//` comment or
@@ -373,29 +339,9 @@ Every exhibit repo's README covers, at minimum:
 Multi-class nodes also get an **Architecture** section: one short paragraph per
 class, purpose and key methods.
 
-## 9. Formatting
+## 9. Git & Repository Conventions
 
-- Indentation: 2 spaces.
-- Line length: prefer ≤ 80 chars (LLVM default).
-- Braces on same line, and **always braced** — even single-statement bodies.
-- One statement per line.
-
-```cpp
-if (cond) {
-  ...
-}
-```
-
-Beyond those four rules, formatting is left to you. Use whatever your editor
-does, keep it consistent within a file, and match the surrounding code. We may
-adopt an automatic formatter later; for now the setup cost isn't worth it.
-
-Don't reformat code you aren't otherwise editing — a diff full of whitespace
-changes hides the change that actually matters.
-
-## 10. Git & Repository Conventions
-
-### 10.1 Commits
+### 9.1 Commits
 
 Short imperative subject, 72 characters or less. If it needs a comma or an "as
 well as", the rest belongs in the body.
@@ -411,7 +357,7 @@ Prefixes keep `git log --oneline` skimmable: `feat`, `fix`, `docs`, `style`,
 `chore`. A `style:` commit contains no functional change, so it's safe to skim
 past when reviewing what actually shipped.
 
-### 10.2 Tag every deployment
+### 9.2 Tag every deployment
 
 The repo must always be able to answer "what is running on that exhibit?" Tag
 at the moment of flashing, one tag per unit when variants differ (§5.2).
@@ -421,7 +367,7 @@ git tag -a deploy/2026-07-31-small -m "flashed to small piston unit"
 git push --tags
 ```
 
-### 10.3 Repo hygiene
+### 9.3 Repo hygiene
 
 - `main` always compiles. Branch (`feat/…`, `fix/…`) when a change is risky or
   spans more than one sitting; otherwise commit straight to `main`.
