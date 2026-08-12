@@ -28,11 +28,11 @@ exhibit-name/
 │   ├── sensor-controller.ino
 │   ├── sketch.yaml
 │   └── src/
-│       ├── App.h / App.cpp  # coordinates subsystems (§1.2)
+│       ├── App.h            # coordinates subsystems (§1.2)
+│       ├── App.cpp
 │       ├── Config.h
 │       ├── Debug.h
 │       └── ...
-│   └── build/               # for local build files, included in .gitignore
 └── led-driver/              # another mcu sketch
 ```
 
@@ -49,8 +49,8 @@ machine spanning them, consider a central `App` class to own that coordination.
 Simpler sketches don't need it - `setup()`/`loop()` can call into `src/` classes
 directly.
 
-> See the `esp32/` sketch in `piston-interactive` for an example of an `App`
-> class.
+> See the `piston-dynamics/` sketch in [`piston-interactive`](https://github.com/iwonder77/piston-interactive) for an
+> example of an `App` class.
 
 ## 2. Naming Conventions
 
@@ -126,7 +126,7 @@ Never construct a replacement and assign over the original.
   `millis()`).
 - Provide `begin()`, `init()`, or `configure()` methods where appropriate.
   These return `bool`, and **callers must check the result**.
-- Saturate error counters so they can't wrap: `if (count_ < 255) ++count_;`
+- Saturate error counters so they can't wrap: `if (count_ < UINT8_MAX) ++count_;`
 
 ### 4.1 Exhibits never halt
 
@@ -137,19 +137,6 @@ waiting on a peripheral, never let a failed sensor stop the main loop.
 Failure handling is a state, not a stop: enter a recovery state, retry on a
 timer, and keep looping. Degrade to a sensible default output rather than
 freezing the last value or going black.
-
-### 4.2 Startup banner
-
-Print identity on boot. When a unit misbehaves in the gallery, a laptop and a
-serial terminal should identify exactly what's flashed on it in ten seconds.
-
-```cpp
-DEBUG_PRINTLN("Piston Interactive - sensor-controller");
-DEBUG_PRINTF("build: %s %s | variant: SMALL\n", __DATE__, __TIME__);
-```
-
-This matters most when one codebase ships in several physical configurations
-(§5.2).
 
 ## 5. `Config.h` - Global Constants, Namespaces, and Utilities
 
@@ -182,15 +169,15 @@ if (now - last_read_ms_ >= config::TIMING_BUDGET_US / 1000) { ... }
 ### 5.2 Per-installation variants
 
 When one codebase ships to several physical units with different constants,
-mark the variant loudly at the top of `Config.h`, keep it to a _single_ switch,
-and print it at boot (§4.2).
+mark the variant loudly at the top of `Config.h` and keep it to a _single_
+switch.
 
 ```cpp
 // ===== SET PER INSTALLATION - see README "Deployment" =====
 constexpr PistonSize DISPLAY_TYPE = PistonSize::SMALL;
 ```
 
-Tag each deployment with its variant (§10.2) so the repo records what's on
+Tag each deployment with its variant (§9.2) so the repo records what's on
 which unit.
 
 ## 6. Embedded Best Practices
