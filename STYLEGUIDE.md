@@ -10,6 +10,9 @@ permalink: /styleguide.html
 A lightweight, practical style guide for the embedded firmware used across our exhibits.
 Designed for a small team: emphasis on clarity, maintainability, and embedded best practices.
 
+It applies to new code and to files you're already editing. Don't retrofit a
+working exhibit just to match it.
+
 ## 1. Project & File Organization
 
 ### 1.1 Repository layout
@@ -109,6 +112,10 @@ timers, debouncers, and health monitors. Define methods inside the class body
 so they're implicitly `inline` - keep those definitions to trivial getters,
 single-line logic, and small math helpers.
 
+Anything longer goes out-of-class as `inline` further down the same header - a
+debouncer's `update()` doesn't have to squeeze into the declaration to stay
+header-only. When in doubt, split.
+
 ### 3.2 Other class design notes
 
 - Use `#pragma once` at the top of every header.
@@ -149,7 +156,8 @@ construct a replacement and assign over the original.
   `millis()`).
 - Hardware setup goes in an `init()` method - one verb, for first bring-up and
   re-initialization alike. It returns `bool`, and **callers must check the
-  result**.
+  result**. On `false`, record the failure and enter the recovery state (§4.1) -
+  never carry on as though it succeeded.
 - Saturate error counters so they can't wrap: `if (count_ < UINT8_MAX) ++count_;`
 
 ### 4.1 Exhibits never halt
@@ -182,11 +190,9 @@ Set explicit bus timeouts for the same reason:
 - Avoid polluting the global namespace.
 - Name constants with units where relevant (§2.3).
 - Group related constants under a `// ----- SECTION -----` comment.
-- `config::` may include very small pure helpers like
-  `static inline float clampf(...)`.
+- Very small pure helpers may live in `util::` or `config::` as `static inline`
+  functions - `clampf(...)` and the like.
 - No magic numbers in logic files. If a literal has meaning, it's a constant.
-- Small utility helpers may live in `util::` or `config::` as `static inline`
-  functions.
 - Do **not** place medium/large logic or hardware code in utility headers.
 
 ### 5.1 Derived values are constants too
@@ -397,8 +403,10 @@ git push --tags
 - `main` always compiles. Branch (`feat/…`, `fix/…`) when a change is risky or
   spans more than one sitting; otherwise commit straight to `main`.
 - `.gitignore` build artifacts (`**/build`). Never ignore source or docs.
-- `sketch.yaml` commits `default_fqbn`. `default_port` differs per machine -
-  edit it locally, don't commit the churn.
+- `sketch.yaml` commits `default_fqbn` plus pinned `platforms:` and
+  `libraries:` versions - that file, not the README prose, is what actually
+  makes a build reproducible (§8.4). `default_port` differs per machine - edit
+  it locally, don't commit the churn.
 - Keep working copies out of cloud-sync folders (OneDrive, Dropbox). Syncing a
   `.git` directory corrupts it; GitHub is the backup.
 - One-time setup: `git config --global user.email you@thanksgivingpoint.org`,
