@@ -20,6 +20,7 @@ the same type).
 
 ```
 exhibit-name/
+├── .clang-format            # formatting, see §2.1
 ├── .clangd                  # editor/LSP support only, not the build
 ├── .gitignore
 ├── README.md                # see §8.4
@@ -52,13 +53,31 @@ directly.
 > See the `piston-dynamics/` sketch in [`piston-interactive`](https://github.com/iwonder77/piston-interactive) for an
 > example of an `App` class.
 
-## 2. Naming Conventions
+## 2. Formatting & Naming
+
+### 2.1 Formatting
+
+Formatting is not a matter of taste here - `clang-format` decides. Copy this
+`.clang-format` into every repo next to `.clangd`, and format on save.
+
+```yaml
+BasedOnStyle: LLVM
+```
+
+LLVM's defaults are what we already write: two-space indent, 80-column limit,
+`Type &name` reference placement. Nothing else in this guide has an opinion on
+braces, indentation, or line length, because nothing else needs one.
+
+To fold in a file that predates the config, reformat it in its own `style:`
+commit (§9.1) so the diff stays reviewable.
+
+### 2.2 Names
 
 | Kind                        | Convention                                                         | Example                           |
 | --------------------------- | ------------------------------------------------------------------ | --------------------------------- |
 | Local variables, parameters | `snake_case`                                                       | `elapsed_time`, `raw_reading`     |
 | Member variables            | `snake_case_` (trailing underscore)                                | `rpm_`, `error_count_`            |
-| Functions & methods         | `camelCase`                                                        | `beginPWM()`, `decayRPM()`        |
+| Functions & methods         | `camelCase`                                                        | `initPWM()`, `decayRPM()`         |
 | Classes, structs, types     | `PascalCase`                                                       | `EngineModel`, `LedOutput`        |
 | Enum types                  | `PascalCase`, always `enum class` with an explicit underlying type | `enum class PistonSize : uint8_t` |
 | Enum values                 | `UPPER_SNAKE_CASE`                                                 | `SMALL`, `ERROR_RECOVERY`         |
@@ -67,7 +86,7 @@ directly.
 | Macros                      | `UPPER_SNAKE_CASE`                                                 | `DEBUG_PRINTLN`                   |
 | Files                       | Match the primary class                                            | `EngineModel.h`                   |
 
-### 2.1 Units in names
+### 2.3 Units in names
 
 Any constant or variable carrying a physical quantity names its unit. This is
 the cheapest bug prevention in the guide - a `_MS` next to a `_US` catches
@@ -99,6 +118,10 @@ single-line logic, and small math helpers.
 - Keep single responsibility per class.
 - Mark every method that doesn't mutate state `const`.
 - Initialize members at the point of declaration, not in the constructor body.
+- **Constructors don't touch hardware.** File-scope objects are constructed
+  before `setup()` runs, before the Arduino core has initialized - no
+  `pinMode()`, no `Wire`, no `Serial` in a constructor. Hardware setup belongs
+  in `init()` (§4), which is why that method exists.
 
 ### 3.3 Hardware-owning classes are non-copyable
 
@@ -117,15 +140,16 @@ public:
 };
 ```
 
-To re-initialize hardware, call `configure()` again on the existing object.
-Never construct a replacement and assign over the original.
+To re-initialize hardware, call `init()` again on the existing object. Never
+construct a replacement and assign over the original.
 
 ## 4. Error Handling & Robustness
 
 - Track errors with counters / boolean flags and recovery timers (use
   `millis()`).
-- Provide `begin()`, `init()`, or `configure()` methods where appropriate.
-  These return `bool`, and **callers must check the result**.
+- Hardware setup goes in an `init()` method - one verb, for first bring-up and
+  re-initialization alike. It returns `bool`, and **callers must check the
+  result**.
 - Saturate error counters so they can't wrap: `if (count_ < UINT8_MAX) ++count_;`
 
 ### 4.1 Exhibits never halt
@@ -138,11 +162,25 @@ Failure handling is a state, not a stop: enter a recovery state, retry on a
 timer, and keep looping. Degrade to a sensible default output rather than
 freezing the last value or going black.
 
+### 4.2 Feed a watchdog
+
+§4.1 is a rule you can follow perfectly and still hang, because the blocking
+happens in code you don't own - a wedged I2C slave, a library call with no
+timeout. Enable the chip's watchdog (`esp_task_wdt_*` on ESP32, `wdt_enable()`
+on AVR) and feed it once per `loop()`, with the timeout as a named constant in
+`Config.h`. A reboot is a poor recovery, but it beats a dark exhibit.
+
+Feed it only from the main loop - never from a timer or an ISR. The point is to
+prove the loop is still turning, not that the chip still has a clock.
+
+Set explicit bus timeouts for the same reason:
+`Wire.setTimeOut(config::I2C_TIMEOUT_MS)`.
+
 ## 5. `Config.h` - Global Constants, Namespaces, and Utilities
 
 - Place all tunables in `config::` as `constexpr`, in one `Config.h` per node.
 - Avoid polluting the global namespace.
-- Name constants with units where relevant (§2.1).
+- Name constants with units where relevant (§2.3).
 - Group related constants under a `// ----- SECTION -----` comment.
 - `config::` may include very small pure helpers like
   `static inline float clampf(...)`.
