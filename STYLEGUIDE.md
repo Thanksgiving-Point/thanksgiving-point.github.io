@@ -360,12 +360,10 @@ Every exhibit repo's README covers, at minimum:
 - **Overview** - what the exhibit does, from a visitor's point of view
 - **Hardware** - boards, sensors, drivers, with links and a wiring diagram
 - **Pinout** - a table, matching `Config.h`
-- **Build & Flash** - exact `arduino-cli` commands, board package version, and
-  pinned library versions
-- **Deployment** - which variants exist, which unit gets which build (§5.2)
-- **Maintenance** - symptoms, likely causes, how to recover. Write it for a
-  technician who has never seen the code. This is the highest-value section in
-  the repo.
+- **Deployment & Maintenance** - libraries used, special `arduino-cli` commands and or build flags,
+  possible sketch variants, which unit gets which build (§5.2), and failure symptoms, likely causes,
+  how to recover. Write it for a technician who has never seen the code. This is the highest-value
+  section in the repo.
 
 Multi-class nodes also get an **Architecture** section: one short paragraph per
 class, purpose and key methods.
