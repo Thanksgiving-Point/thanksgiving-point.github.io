@@ -360,10 +360,21 @@ Every exhibit repo's README covers, at minimum:
 - **Overview** - what the exhibit does, from a visitor's point of view
 - **Hardware** - boards, sensors, drivers, with links and a wiring diagram
 - **Pinout** - a table, matching `Config.h`
-- **Deployment & Maintenance** - libraries used, special `arduino-cli` commands and or build flags,
-  possible sketch variants, which unit gets which build (§5.2), and failure symptoms, likely causes,
-  how to recover. Write it for a technician who has never seen the code. This is the highest-value
-  section in the repo.
+- **Deployment** - anything non-obvious about building and flashing: special
+  `arduino-cli` flags, upload quirks, a bootloader button that has to be held.
+  Core and library versions live in `sketch.yaml` (§9.3), not here. Then the
+  variants that exist and which physical unit gets which build (§5.2).
+- **Maintenance** - the highest-value section in the repo. Write it for a
+  technician who has never seen the code and is reading it on the gallery floor
+  with visitors waiting:
+  - What the exhibit looks like when it's working, so "wrong" is recognizable.
+  - Symptoms, likely cause, and recovery - most common failure first, and the
+    steps that need no laptop before the ones that do.
+  - Which failures recover on their own (§4.1) and roughly how long that takes,
+    so nobody power-cycles a unit that was about to fix itself.
+  - What to rule out before suspecting the firmware: connectors, power, a dusty
+    sensor lens.
+  - Who to call when none of the above works.
 
 Multi-class nodes also get an **Architecture** section: one short paragraph per
 class, purpose and key methods.
